@@ -104,32 +104,39 @@ async function loadBaseImage(src, fileName) {
 	else
 		elFilePreviewName.textContent = fileName
 	elFilePreviewSize.textContent = `(${image.width}x${image.height})`
-	if ((image.width > 78 || image.height > 78) && image.width == image.height) {
-		inputWidth.value = inputHeight.value = 78
+	autoFillDims(cbUseTurretScale.checked)
+}
+
+cbUseTurretScale.addEventListener("change", function () {
+	if (hasSetWidth || hasSetHeight || !hasChosenImage) return
+	autoFillDims(this.checked)
+})
+
+function autoFillDims(turretScale) {
+	if (image.width == image.height && image.width > 78) {
+		inputWidth.value = inputHeight.value = turretScale ? 78 / 3 : 78
 	} else {
-		if (!hasSetWidth && image.width < 79)
-			inputWidth.value = image.width
-		if (!hasSetHeight && image.height < 79)
-			inputHeight.value = image.height
+		if (image.width <= 78)
+			inputWidth.value = turretScale ? (image.width / 3).toFixed(1) : image.width
+		if (image.height <= 78)
+			inputHeight.value = turretScale ? (image.height / 3).toFixed(1) : image.height
 	}
 }
 
 inputWidth.addEventListener("input", function () {
 	if (!hasSetHeight) {
-		if (image.width > 78 && this.value)
-			inputHeight.value = Math.round(calAspectRatioFit(image.width, image.height, parseInt(this.value), image.height).height)
-		else
-			inputHeight.value = this.value
+		let fit = calAspectRatioFit(image.width, image.height, parseFloat(this.value), image.height).height
+		if (isNaN(fit)) return
+		inputHeight.value = cbUseTurretScale.checked ? toNearestTurretScale(fit) : Math.round(fit)
 	}
 	hasSetWidth = true
 })
 
 inputHeight.addEventListener("input", function () {
 	if (!hasSetWidth) {
-		if (image.height > 78 && this.value)
-			inputWidth.value = Math.round(calAspectRatioFit(image.width, image.height, image.width, parseInt(this.value)).width)
-		else
-			inputWidth.value = this.value
+		let fit = calAspectRatioFit(image.width, image.height, image.width, parseFloat(this.value)).width
+		if (isNaN(fit)) return
+		inputWidth.value = cbUseTurretScale.checked ? toNearestTurretScale(fit) : Math.round(fit)
 	}
 	hasSetHeight = true
 })
@@ -143,7 +150,7 @@ buttonProcess.addEventListener("click", async function () {
 	const width = cbUseTurretScale.checked ? Math.round(parseFloat(inputWidth.value) * 3) : parseInt(inputWidth.value)
 	if (!width || width < 1)
 		return notice("The entered width is invalid.")
-	const height =  cbUseTurretScale.checked ? Math.round(parseFloat(inputHeight.value) * 3) : parseInt(inputHeight.value)
+	const height = cbUseTurretScale.checked ? Math.round(parseFloat(inputHeight.value) * 3) : parseInt(inputHeight.value)
 	if (!height || height < 1)
 		return notice("The entered height is invalid.")
 	const pixelSize = parseInt(inputPixelSize.value)
@@ -308,6 +315,15 @@ buttonShowResized.addEventListener("click", () => window.open(URL.createObjectUR
 })
 
 document.querySelectorAll(".tooltip-ref").forEach(addTooltip)
+
+function toNearestTurretScale(n) {
+	let int = Math.trunc(n)
+	let dec = n - int
+	if (dec == 0) return int
+	if (dec <= 1 / 3) return int + 0.3
+	if (dec <= 1 / 3 * 2) return int + 0.6
+	return int + 1
+}
 
 function calAspectRatioFit(w, h, maxW, maxH) {
 	let ratio = Math.min(maxW / w, maxH / h)

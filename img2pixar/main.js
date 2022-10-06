@@ -17,8 +17,9 @@ const container = document.querySelector("#main-container")
 const inputFile = container.querySelector(".input-file>input")
 const inputWidth = container.querySelector(".input-width")
 const inputHeight = container.querySelector(".input-height")
-const inputDrawPaintId = container.querySelector(".checkbox-paint-id")
-const inputDrawPaintShape = container.querySelector(".checkbox-paint-shape")
+const cbUseTurretScale = container.querySelector(".cb-use-turret-scale")
+const cbDrawPaintId = container.querySelector(".cb-paint-id")
+const cbDrawPaintShape = container.querySelector(".cb-paint-shape")
 const inputCoordX = container.querySelector(".input-coord-x")
 const inputCoordY = container.querySelector(".input-coord-y")
 const inputPixelSize = container.querySelector(".input-pixel-size")
@@ -139,10 +140,10 @@ inputCoordY.addEventListener("input", function () { inShipCoordY = parseInt(this
 buttonProcess.addEventListener("click", async function () {
 	if (!hasChosenImage)
 		return notice("You haven't chosen an image.")
-	const width = parseInt(inputWidth.value)
+	const width = cbUseTurretScale.checked ? Math.round(parseFloat(inputWidth.value) * 3) : parseInt(inputWidth.value)
 	if (!width || width < 1)
 		return notice("The entered width is invalid.")
-	const height = parseInt(inputHeight.value)
+	const height =  cbUseTurretScale.checked ? Math.round(parseFloat(inputHeight.value) * 3) : parseInt(inputHeight.value)
 	if (!height || height < 1)
 		return notice("The entered height is invalid.")
 	const pixelSize = parseInt(inputPixelSize.value)
@@ -178,14 +179,14 @@ buttonProcess.addEventListener("click", async function () {
 		imageData: canvasCtx.getImageData(0, 0, canvas.width, canvas.height),
 		pixelSize: pixelSize,
 		fontSize: fontSize,
-		drawPaintShape: inputDrawPaintShape.checked,
-		drawPaintId: inputDrawPaintId.checked
+		drawPaintShape: cbDrawPaintShape.checked,
+		drawPaintId: cbDrawPaintId.checked
 	})
 
 	let imageData = result.imageData
 	displayPixelSize = pixelSize
 	displayPaintHeight = height
-	elResultInfo.textContent = `${imageData.width}x${imageData.height} - ${Math.round(performance.now() - start)}ms`
+	elResultInfo.textContent = `${width}x${height}sq - ${imageData.width}x${imageData.height}px - ${Math.round(performance.now() - start)}ms`
 	canvas.width = displayWidth = imageData.width
 	canvas.height = displayHeight = imageData.height
 	canvasCtx.putImageData(imageData, 0, 0)

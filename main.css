@@ -78,6 +78,20 @@ a.no-style:visited {
 	flex: 1 1 0px;
 }
 
+.line-up-right {
+	border-left: 2px solid gray;
+	border-bottom: 2px solid gray;
+	border-bottom-left-radius: 6px;
+	bottom: 0;
+	box-sizing: border-box;
+	content: "";
+	display: inline-block;
+	height: 10px;
+	width: 25px;
+	left: -36px;
+	margin: 0 4px 2px 5px;
+}
+
 /* Header */
 header {
 	width: 100%;
@@ -181,7 +195,7 @@ footer .credits a {
 	position: absolute;
 	left: 0;
 	top: 40%;
-	width: 600%;
+	width: 450%;
 	height: 35px;
 	left: 50%;
 	transform: translateX(-50%);
@@ -194,8 +208,7 @@ footer .credits a {
 	display: none;
 	position: fixed;
 	padding: 8px;
-	width: 360px;
-	max-width: calc(100vw - 25px);
+	max-width: min(360px, calc(100vw - 25px));
 	background-color: var(--body-color);
 	border-radius: 3px;
 	outline: 1px dashed gray;

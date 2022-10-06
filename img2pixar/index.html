@@ -44,7 +44,7 @@
 				<span class="tooltip-space"></span>
 			</span>
 			<span class="tooltip-content">
-				Prefer copying an image and pasting (CTRL+V) here instead of saving it as a file, for faster usage.
+				For faster usage, copy and paste (ctrl-v) rather than saving an image.
 				<br><br>This tool works completely offline, the image won't be uploaded.
 			</span>
 		</p>
@@ -56,8 +56,8 @@
 		<div class="columns" style="max-width: 800px; margin-top: -10px;">
 			<div>
 				<p>
-					Pixel Art Size: <span class="no-select">&#8596;<input class="input-width" type="number" min="1" placeholder="--">
-					&#10005; <input class="input-height" type="number" min="1" placeholder="--">&#8597;</span>
+					Pixel Art Size: <span class="no-select">&#8596;<input class="input-width" type="number" min="1" step="any" placeholder="--">
+					&#10005; <input class="input-height" type="number" min="1" step="any" pattern="\d*" placeholder="--">&#8597;</span>
 					<span class="tooltip-ref help-circle" data-allow-hover>
 						<span class="text">?</span>
 						<span class="tooltip-space"></span>
@@ -65,6 +65,16 @@
 					<span class="tooltip-content">
 						The pixel art size in the game. For a max size ship, it is 78x78.
 						The image will be resized in high quality if it is not the correct size.
+					</span>
+					<br><span class="line-up-right" style="margin-top: 5px;"></span>Use Turret Scale: <input class="cb-use-turret-scale" type="checkbox">
+					<span class="tooltip-ref help-circle" data-allow-hover>
+						<span class="text">?</span>
+						<span class="tooltip-space"></span>
+					</span>
+					<span class="tooltip-content">
+						If enabled: 1 equals to 3 squares,
+						<br>0.3 equals to 1 square.
+						<br>e.g. 7x7.6 = 21x23
 					</span>
 				</p>
 				<p>Color Space: <select class="select-color-space">
@@ -74,8 +84,8 @@
 				<p>Paint ID Font Size: <input class="input-font-size" type="number" min="1" value="12"></p>
 			</div>
 			<div>
-				<p>Draw Paint Ids: <input class="checkbox-paint-id" type="checkbox" checked></p>
-				<p>Draw Paint Shapes: <input class="checkbox-paint-shape" type="checkbox"></p>
+				<p>Draw Paint Ids: <input class="cb-paint-id" type="checkbox" checked></p>
+				<p>Draw Paint Shapes: <input class="cb-paint-shape" type="checkbox"></p>
 				<p>Pixel Size: <input class="input-pixel-size" type="number" min="1" value="22"></p>
 				<p>In-ship Coords: <span class="no-select">x<input class="input-coord-x" type="number" min="0" value="1" placeholder="--">,
 					y<input class="input-coord-y" type="number" min="0" value="1" placeholder="--"></span>

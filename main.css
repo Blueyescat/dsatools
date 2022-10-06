@@ -49,11 +49,12 @@ a.no-style:visited {
 }
 
 /**/
+
 #main-container {
 	position: relative;
 	background-color: var(--container-color);
 	border-radius: 5px;
-	padding: 5px 20px;
+	padding: 10px 20px 5px 20px;
 	max-width: var(--page-width);
 	margin-right: auto;
 	margin-left: auto;

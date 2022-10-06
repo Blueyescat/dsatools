@@ -1,0 +1,73 @@
+.input-file>button,
+.input-file-url {
+	font-size: 15px;
+}
+
+.input-width,
+.input-height,
+.input-pixel-size,
+.input-font-size,
+.input-coord-x,
+.input-coord-y {
+	width: 50px;
+}
+
+.button-process {
+	margin: 15px 0;
+	font-size: 17px;
+	padding: 7px;
+}
+
+.notice {
+	color: #D8000C;
+}
+
+.result-container {
+	outline: 1px solid gray;
+	cursor: move;
+	margin-bottom: 20px;
+	overflow: hidden;
+	position: relative;
+}
+
+.result-container .zoomist-wrapper {
+	background-color: #26282B !important;
+}
+
+.result-hover-square {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 10000000;
+	pointer-events: none;
+	outline: 3px solid #2291c9;
+}
+
+.result-hover-square>.coords {
+	position: absolute;
+	color: #6bceff;
+	background-color: black;
+	white-space: nowrap;
+	border-radius: 10px;
+	padding: 1px 3px;
+}
+
+.file-preview {
+	display: inline-block;
+	outline: 1px dashed gray;
+	padding-right: 5px;
+}
+
+.file-preview>img {
+	vertical-align: middle;
+	max-width: 120px;
+	max-height: 60px;
+}
+
+.file-preview>img:not([src]) {
+	display: none;
+}
+
+details {
+	display: inline-block;
+}

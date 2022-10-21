@@ -22,13 +22,13 @@ globalThis.img2pixar = async function (canvas, options) {
 	let pixelSize = options.pixelSize
 	let width = options.imageData.width
 	let height = options.imageData.height
-	let shapeImage
+	let textureImage
 
 	canvas.width = width * pixelSize
 	canvas.height = height * pixelSize
 	if (options.drawPaintId) canvasCtx.font = `${options.fontSize}px Verdana, Geneva, Tahoma, sans-serif`
-	if (options.drawPaintShape) {
-		shapeImage = await loadImage(globalThis.toolPath + "/assets/bg_ship.png")
+	if (options.drawPaintTexture) {
+		textureImage = await loadImage(globalThis.toolPath + "/assets/bg_ship.png")
 	}
 
 	let x = 0, y = 0
@@ -42,8 +42,8 @@ globalThis.img2pixar = async function (canvas, options) {
 		let rgbPaintColor = palettes.RGB[paintId]
 		let cssColor = `rgb(${rgbPaintColor[0]}, ${rgbPaintColor[1]}, ${rgbPaintColor[2]})`
 
-		if (shapeImage) {
-			canvasCtx.drawImage(shapeImage, x, y, pixelSize, pixelSize)
+		if (textureImage) {
+			canvasCtx.drawImage(textureImage, x, y, pixelSize, pixelSize)
 			canvasCtx.fillStyle = cssColor
 			canvasCtx.globalCompositeOperation = "multiply"
 			canvasCtx.fillRect(x, y, pixelSize, pixelSize)

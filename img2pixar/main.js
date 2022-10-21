@@ -19,7 +19,7 @@ const inputWidth = container.querySelector(".input-width")
 const inputHeight = container.querySelector(".input-height")
 const cbUseTurretScale = container.querySelector(".cb-use-turret-scale")
 const cbDrawPaintId = container.querySelector(".cb-paint-id")
-const cbDrawPaintShape = container.querySelector(".cb-paint-shape")
+const cbDrawPaintTexture = container.querySelector(".cb-paint-texture")
 const cbNoSmoothResizing = container.querySelector(".cb-no-smooth-resizing")
 const inputCoordX = container.querySelector(".input-coord-x")
 const inputCoordY = container.querySelector(".input-coord-y")
@@ -188,7 +188,7 @@ buttonProcess.addEventListener("click", async function () {
 		imageData: canvasCtx.getImageData(0, 0, canvas.width, canvas.height),
 		pixelSize: pixelSize,
 		fontSize: fontSize,
-		drawPaintShape: cbDrawPaintShape.checked,
+		drawPaintTexture: cbDrawPaintTexture.checked,
 		drawPaintId: cbDrawPaintId.checked
 	})
 

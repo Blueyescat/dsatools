@@ -20,6 +20,7 @@ const inputHeight = container.querySelector(".input-height")
 const cbUseTurretScale = container.querySelector(".cb-use-turret-scale")
 const cbDrawPaintId = container.querySelector(".cb-paint-id")
 const cbDrawPaintShape = container.querySelector(".cb-paint-shape")
+const cbNoSmoothResizing = container.querySelector(".cb-no-smooth-resizing")
 const inputCoordX = container.querySelector(".input-coord-x")
 const inputCoordY = container.querySelector(".input-coord-y")
 const inputPixelSize = container.querySelector(".input-pixel-size")
@@ -165,18 +166,19 @@ buttonProcess.addEventListener("click", async function () {
 	elResultInfo.textContent = "..."
 	let start = performance.now()
 
-	let cache = resizeCache[width + "" + height]
-	if (!cache && image.width == width && image.height == height) {
+	let cacheKey = "" + cbNoSmoothResizing.checked + width + height
+	let cachedBlob = resizeCache[cacheKey]
+	if (!cachedBlob && image.width == width && image.height == height) {
 		canvasCtx.drawImage(image, 0, 0, canvas.width, canvas.height)
 		buttonShowResized.style.display = "none"
 	} else {
-		if (cache) {
-			image.src = URL.createObjectURL(cache)
+		if (cachedBlob) {
+			image.src = URL.createObjectURL(cachedBlob)
 			if (!image.complete) await new Promise(resolve => image.onload = () => resolve())
 			canvasCtx.drawImage(image, 0, 0, canvas.width, canvas.height)
 		} else {
-			await Pica.resize(image, canvas)
-			canvas.toBlob(blob => resizeCache[width + "" + height] = resizedImageBlob = blob)
+			await Pica.resize(image, canvas, cbNoSmoothResizing.checked ? { filter: "box" } : undefined)
+			canvas.toBlob(blob => resizeCache[cacheKey] = resizedImageBlob = blob)
 		}
 		buttonShowResized.style.display = ""
 	}
@@ -247,7 +249,7 @@ elResult.addEventListener(usesTouch ? "touchend" : "click", function (event) {
 		return
 	let clientX = thing.clientX
 	let clientY = thing.clientY
-	// Calculate coords of the hovered on paint pixel on the image (relative to zoom)
+	// calculate coords of the hovered on paint pixel on the image (relative to zoom)
 	let img = target
 	let imgRect = img.getBoundingClientRect()
 	let x = clientX - imgRect.left

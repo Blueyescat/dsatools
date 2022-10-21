@@ -56,6 +56,18 @@
 		<div class="columns" style="max-width: 800px; margin-top: -10px;">
 			<div>
 				<p>
+					No Smooth Resizing: <input class="cb-no-smooth-resizing" type="checkbox">
+					<span class="tooltip-ref help-circle" data-allow-hover>
+						<span class="text">?</span>
+						<span class="tooltip-space"></span>
+					</span>
+					<span class="tooltip-content">
+						Don't smooth the image when resizing. May give better results in some cases like using a pixel art image.
+						<br><br>If using a pixel art image, it should only contain the art (no space around)
+						and the pixel art size should be the size of the art in the image.
+					</span>
+				</p>
+				<p>
 					Pixel Art Size: <span class="no-select">&#8596;<input class="input-width" type="number" min="1" step="any" placeholder="--">
 					&#10005; <input class="input-height" type="number" min="1" step="any" pattern="\d*" placeholder="--">&#8597;</span>
 					<span class="tooltip-ref help-circle" data-allow-hover>

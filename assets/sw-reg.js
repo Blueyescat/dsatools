@@ -1,9 +1,9 @@
 /* Service Worker Register & Update */
 navigator.serviceWorker?.register("/sw.js", { scope: "/" }).then(reg => {
 	const start = Date.now(), first = !navigator.serviceWorker.controller
-	const fade = () => document.getElementById("main-container").style.opacity = "0.2"
-	first && fade()
 	reg.addEventListener("updatefound", () => { // updatefound = reg.installing
+		const fade = () => document.getElementById("main-container").style.opacity = "0.2"
+		first && fade()
 		reg.installing.addEventListener("statechange", e => {
 			first || fade()
 			if (e.target.state != "activating") return

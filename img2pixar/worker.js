@@ -1,10 +1,10 @@
-globalThis.toolPath = this.location.href.substring(0, this.location.href.lastIndexOf("/"))
+globalThis.toolPath = self.location.href.substring(0, self.location.href.lastIndexOf("/"))
 
 importScripts("converter.js")
 
-let offscreenCanvas = new OffscreenCanvas(1, 1)
+const offscreenCanvas = new OffscreenCanvas(1, 1)
 
-this.addEventListener("message", async function (event) {
-	let imageData = await globalThis.img2pixar(offscreenCanvas, event.data)
-	postMessage({ imageData: imageData })
+self.addEventListener("message", e => {
+	globalThis.img2pixar(offscreenCanvas, e.data)
+		.then(imageData => postMessage({ imageData }))
 })

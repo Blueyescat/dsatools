@@ -1,0 +1,8 @@
+{
+  "javascript.format.semicolons": "remove",
+  "javascript.preferences.quoteStyle": "double",
+  "typescript.format.semicolons": "remove",
+  "typescript.preferences.quoteStyle": "double",
+  "html.format.extraLiners": "",
+  "html.format.wrapLineLength": 0
+}

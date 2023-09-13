@@ -17,11 +17,11 @@ globalThis.img2pixar = async function (canvas, options) {
 		if (!document) return // if no canvas, should be called from main thread
 		canvas = document.createElement("canvas")
 	}
-	let canvasCtx = canvas.getContext("2d")
-	let pixels = options.imageData.data
-	let pixelSize = options.pixelSize
-	let width = options.imageData.width
-	let height = options.imageData.height
+	const canvasCtx = canvas.getContext("2d", { willReadFrequently: true })
+	const pixels = options.imageData.data
+	const pixelSize = options.pixelSize
+	const width = options.imageData.width
+	const height = options.imageData.height
 	let textureImage
 
 	canvas.width = width * pixelSize
@@ -38,9 +38,9 @@ globalThis.img2pixar = async function (canvas, options) {
 			x = 0
 		}
 
-		let paintId = getClosestPaint(options.colorSpace, [pixels[i], pixels[i + 1], pixels[i + 2]])
-		let rgbPaintColor = palettes.RGB[paintId]
-		let cssColor = `rgb(${rgbPaintColor[0]}, ${rgbPaintColor[1]}, ${rgbPaintColor[2]})`
+		const paintId = getClosestPaint(options.colorSpace, [pixels[i], pixels[i + 1], pixels[i + 2]])
+		const rgbPaintColor = palettes.RGB[paintId]
+		const cssColor = `rgb(${rgbPaintColor[0]}, ${rgbPaintColor[1]}, ${rgbPaintColor[2]})`
 
 		if (textureImage) {
 			canvasCtx.drawImage(textureImage, x, y, pixelSize, pixelSize)
@@ -79,7 +79,7 @@ function getClosestPaint(cspace, color) {
 	else
 		palette = "RGB", func = euclideanDistance
 	let resultId, closestId
-	let colorText = color.join("")
+	const colorText = color.join("")
 	if (!Object.hasOwn(paintMatchCache, palette)) {
 		paintMatchCache[palette] = {}
 	}
@@ -88,8 +88,8 @@ function getClosestPaint(cspace, color) {
 	} else {
 		let shortestDist = -1
 		for (const id in palettes[palette]) {
-			let c = palettes[palette][id]
-			let dist = func(color, c)
+			const c = palettes[palette][id]
+			const dist = func(color, c)
 			if (shortestDist == -1 || dist < shortestDist) {
 				shortestDist = dist
 				resultId = id
@@ -105,7 +105,7 @@ function euclideanDistance(c1, c2) {
 	return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2) + Math.pow(c1[2] - c2[2], 2))
 }
 
-// Credit https://github.com/hamada147/IsThisColourSimilar/blob/master/Colour.js#L252
+// credit https://github.com/hamada147/IsThisColourSimilar/blob/master/Colour.js#L252
 function deltaE2000(lab1, lab2) {
 	const rad2deg = rad => 360 * rad / (2 * Math.PI)
 	const deg2rad = deg => (2 * Math.PI * deg) / 360

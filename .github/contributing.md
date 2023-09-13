@@ -1,23 +1,16 @@
-## Reporting Issues
-Make an [Issue](https://github.com/Blueyescat/dsatools/issues/new) with good details.
+### Issues / Bugs
+Create a detailed issue in the [Issues](https://github.com/Blueyescat/dsatools/issues) page.
 
-## Suggesting and Asking
+### Suggestions and Questions
 Use the [Discussions](https://github.com/Blueyescat/dsatools/discussions) page.
 
-## Contributing to the Code
-### Things to Know
-* To run the website in local, you will need a web server serving a directory (web server root directory) containing the root of this repository.
-For example, it should serve `GitHub/` for `GitHub/dsatools/` then you can access it at `//localhost:port/dsatools/`.
-The paths in the website are made in a way working properly with GitHub Pages.
-With this setup, there won't be any difference between the published page and your local project.
+## Code Contribution
+* Consider asking if your change is wanted before starting to work on it or making a pull request.
+* Please try to keep the code clean and follow the existing formatting. Use ESLint.
+* This project aims to remain simple. I'm not interested in adding frameworks or large libraries unless it is really necessary.
+* You need a web server that serves the root of this project. You may need HTTPS with a trusted certificate if the service worker doesn't work. Check out [local-web-server](https://github.com/lwsjs/local-web-server).
+* Feel free to contact me on Discord about this. (`@blueyescat`)
 
-  A web server is also needed for web workers to work on browsers.
-* Use ESLint with the config already in the repository. Try and keep the code clean, follow the existing formatting.
-  * I'm okay with fixing formatting issues after your pull request.
-* This project is meant to be kept simple. I'm not willing to add frameworks, big libraries and such.
-* You can have your credit at the bottom of the tool page.
-* Feel free to contact me on Discord about this! `Blueyescat#0733`
-
-### After Done Programming
-1. Test your changes and make sure they work. Also make sure they don't break existing stuff.
-2. Make a [Pull request](https://github.com/Blueyescat/dsatools/pulls).
+### After Finishing Development
+1. Test your changes on multiple browsers to ensure they work and don't break any existing functionality.
+2. Create a [pull request](https://github.com/Blueyescat/dsatools/pulls) targeting the `dev` branch.

@@ -1,0 +1,42 @@
+{
+  "id": "dsatools",
+  "name": "DSA Tools",
+  "short_name": "DSA Tools",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#16181c",
+  "theme_color": "#16181c",
+  "description": "Various tools for the Deep Space Airships game.",
+  "icons": [
+    {
+      "src": "/assets/icons/64.webp",
+      "sizes": "64x64"
+    }, {
+      "src": "/assets/icons/80m.webp",
+      "sizes": "80x80",
+      "purpose": "maskable"
+    }, {
+      "src": "/assets/icons/96.webp",
+      "sizes": "96x96"
+    }, {
+      "src": "/assets/icons/144.webp",
+      "sizes": "144x144"
+    }, {
+      "src": "/assets/icons/512.png",
+      "sizes": "512x512"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "DSA Tools",
+      "url": ".",
+      "icons": [
+        {
+          "src": "/assets/icons/96.webp",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

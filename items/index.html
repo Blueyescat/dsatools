@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base href="/items/">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Item list for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Item List - DSA Tools">
+	<meta property="og:description" content="List of items in the game.">
+	<meta property="theme-color" content="#1f80b1">
+	<title>Item List</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script src="/assets/sw-reg.js"></script>
+	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
+	<link type="text/css" rel="stylesheet" href="/main.css">
+</head>
+<body>
+	<header></header>
+	<div id="main-container" style="min-height: 100vh;">
+		<p style="margin-top: 0;">
+			<small>
+				The data is downloaded from
+				<a href="https://pub.drednot.io/test/econ/item_schema.json" target="_blank">pub.drednot.io/test/econ/item_schema.json</a>
+				as the page loads, and that file updates at 0 UTC.
+			</small>
+		</p>
+		<p>
+			<input id="input-search" autocomplete="off" placeholder="Search items by name, description or ID"></input>
+			<button id="button-clear"><i class="i x"></i></button>
+			<small style="float: right; padding-top: 1em;">Showing <span id="shown"></span><span id="total">-</span> items</small>
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th style="width: 10%;">Image</th>
+					<th style="width: 5%;">ID</th>
+					<th style="width: 20%;">Name</th>
+					<th style="width: 50%;">Description</th>
+				</tr>
+			</thead>
+			<tbody id="content"></tbody>
+		</table>
+		<footer></footer>
+	</div>
+	<script type="module">
+		const elContent = document.getElementById("content")
+		let data
+		try {
+			data = await fetch("https://x.dsatools.workers.dev?https://pub.drednot.io/test/econ/item_schema.json", { cache: "reload" })
+				.then(res => res.json())
+		} catch (err) {
+			elContent.innerHTML = `<td></td><td>Error fetching or parsing the data: ${err.message}</td>`
+		}
+		if (data) {
+			const regexPkg = / \(Packaged\)|, Packaged/
+			// load table	
+			for (const [i, item] of data.entries()) {
+				elContent.insertAdjacentHTML("beforeend", `<tr${i % 2 == 0 ? " class=\"odd\"" : ""}>`
+					+ `<td><img src="https://test.drednot.io/img/${item.image}.png"></td>`
+					+ `<td>${item.id}</td>`
+					+ `<td>${item.name.replace(regexPkg, "")}</td>`
+					+ `<td>${item.desc}</td>`
+					+ "</tr>"
+				)
+			}
+			const rows = elContent.children
+			document.getElementById("total").textContent = rows.length
+			const shown = document.getElementById("shown")
+			const inputSearch = document.getElementById("input-search")
+			// search
+			inputSearch.addEventListener("input", () => {
+				const query = inputSearch.value.toLowerCase().trim().replace(/ +/, " ")
+				let count = 0
+				for (const tr of rows) {
+					tr.classList.toggle("hidden", (query == ""
+						|| tr.children[2].textContent.toLowerCase().includes(query)
+						|| tr.children[1].textContent == query
+						|| tr.children[3].textContent.toLowerCase().includes(query)
+					) ? !++count : true)
+					tr.classList.toggle("odd", count % 2 == 1)
+				}
+				shown.textContent = count < rows.length ? count + " out of " : ""
+			})
+			// search clear
+			document.getElementById("button-clear").addEventListener("click", () => {
+				inputSearch.value = ""
+				inputSearch.focus()
+				inputSearch.dispatchEvent(new Event("input"))
+			})
+		}
+		import "/main.js"
+		document.querySelector("header nav .dropdown>.text").innerHTML = "Item List"
+		document.getElementById("credits-section").style.display = "none"
+	</script>
+	<script defer src="/assets/goatc.min.js"></script>
+	<style>
+		table {
+			background-color: #202228;
+			border: 2px solid var(--input-border-color);
+			border-spacing: 0;
+			border-radius: 8px;
+			width: 100%;
+			overflow: hidden;
+		}
+
+		thead th {
+			background-color: #202228;
+			border-radius: 8px;
+		}
+
+		.odd {
+			background-color: var(--container-color);
+		}
+
+		td>img {
+			vertical-align: middle;
+		}
+
+		th,
+		td {
+			padding: 0.4rem 0.85rem;
+		}
+
+		th,
+		td {
+			text-align: center;
+		}
+
+		img {
+			width: 24px;
+			height: 24px;
+		}
+
+		td:nth-child(2),
+		td:nth-child(3) {
+			font-family: monospace;
+		}
+
+		td:nth-child(4) {
+			font-size: small;
+			text-align: left;
+		}
+
+		#input-search {
+			box-sizing: border-box;
+			width: 100%;
+			max-width: 450px;
+			padding: 6px;
+			border-radius: 8px;
+		}
+
+		.hidden {
+			display: none;
+		}
+	</style>
+</body>
+</html>

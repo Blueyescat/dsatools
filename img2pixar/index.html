@@ -1,41 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<base href="/dsatools/">
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<base href="/img2pixar/">
+	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Image to Pixel Art converter for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
 	<meta property="og:type" content="website">
 	<meta property="og:title" content="Image to Pixel Art - DSA Tools">
-	<meta property="og:description" content="Create a pixel art from an image.">
+	<meta property="og:description" content="Create an in-game pixel art from an image.">
 	<meta property="theme-color" content="#1f80b1">
-	<title>Image to Pixel Art - DSA Tools</title>
-	<link rel="icon" type="image/png" href="./icon.png">
-	<link rel="stylesheet" href="./main.css">
-	<link rel="stylesheet" href="./img2pixar/main.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cotton123236/zoomist@latest/dist/zoomist.min.css"/>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/pica/9.0.1/pica.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script src="https://cdn.jsdelivr.net/gh/cotton123236/zoomist@latest/dist/zoomist.min.js"></script>
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-F4H914ZK0H"></script>
-	<script>
-		window.dataLayer = window.dataLayer || []
-		function gtag() { dataLayer.push(arguments) }
-		gtag("js", new Date())
-		gtag("config", "G-F4H914ZK0H")
-	</script>
+	<title>Image to Pixel Art</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script src="/assets/sw-reg.js"></script>
+	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
+	<link type="text/css" rel="stylesheet" href="/main.css">
+	<link type="text/css" rel="stylesheet" href="./main.css">
+	<link type="text/css" rel="stylesheet" href="/assets/lib/zoomist/zoomist.min.css" />
+	<script src="/assets/lib/pica/pica.min.js"></script>
+	<script src="/assets/lib/zoomist/zoomist.min.js"></script>
 </head>
 <body>
-	<!--
-		👋 Hey! Would you like to modify something or add your own tool on this website?
-		Feel free to make a pull request on GitHub!
-	-->
 	<header></header>
 	<div id="main-container">
-		<small>Create an in-game pixel art from an image by finding closest paint colors for each pixel in the image. Start by selecting an image.</small>
+		<small>Create an in-game pixel art from an image by finding closest paint colors for each pixel in the image.</small>
 		<h3>Base Image</h3>
 		<p>
-			<span class="custom-file-input input-file">
-				<input type="file" accept="image/*" style="display: none;">
+			<span class="custom-file-input">
+				<input id="input-file" type="file" accept="image/*" style="display: none;">
 				<button>Select File</button>
 			</span>
 			<small>You can also paste or drag & drop an image into the page.</small>
@@ -44,11 +36,11 @@
 				<span class="tooltip-space"></span>
 			</span>
 			<span class="tooltip-content">
-				For faster usage, copy and paste (ctrl-v) rather than saving an image.
+				Rather than saving an image just to use here, you can just copy it and paste (CTRL+V) here.
 				<br><br>This tool works completely offline, the image won't be uploaded.
 			</span>
 		</p>
-		<div class="file-preview">
+		<div id="preview" class="file-preview">
 			<img>
 			<small class="name"></small> <small class="size"></small>
 		</div>
@@ -56,29 +48,34 @@
 		<div class="columns" style="max-width: 800px; margin-top: -10px;">
 			<div>
 				<p>
-					No Smooth Resizing: <input class="cb-no-smooth-resizing" type="checkbox">
+					No Smooth Resizing: <input id="cb-no-smooth-resizing" type="checkbox" autocomplete="off">
 					<span class="tooltip-ref help-circle" data-allow-hover>
 						<span class="text">?</span>
 						<span class="tooltip-space"></span>
 					</span>
 					<span class="tooltip-content">
-						Don't smooth the image when resizing. May give better results in some cases like using a pixel art image.
+						Disables smooth resizing. May give better results in some cases like using a pixel art image.
 						<br><br>If using a pixel art image, it should only contain the art (no space around)
-						and the pixel art size should be the size of the art in the image.
+						and the size options should be set to the size of the pixel art in the image.
 					</span>
 				</p>
 				<p>
-					Pixel Art Size: <span class="no-select">&#8596;<input class="input-width" type="number" min="1" step="any" placeholder="--">
-					&#10005; <input class="input-height" type="number" min="1" step="any" pattern="\d*" placeholder="--">&#8597;</span>
+					Pixel Art Size:
+					<i class="i arrows-l-r"></i><input id="input-width" type="number" min="1" step="any" placeholder="--" autocomplete="off">
+					<i class="i x" style="font-size: 0.78rem; vertical-align: middle;"></i>
+					<input id="input-height" type="number" min="1" step="any" pattern="\d*" placeholder="--" autocomplete="off"><i class="i arrows-u-d"></i>
 					<span class="tooltip-ref help-circle" data-allow-hover>
 						<span class="text">?</span>
 						<span class="tooltip-space"></span>
 					</span>
 					<span class="tooltip-content">
-						The pixel art size in the game. For a max size ship, it is 78x78.
-						The image will be resized in high quality if it is not the correct size.
+						The pixel art size in the game. For a max size ship, it is 78x78 excluding hull.
+						The image will be resized to match this size.
 					</span>
-					<br><span class="line-up-right" style="margin-top: 5px;"></span>Use Turret Scale: <input class="cb-use-turret-scale" type="checkbox">
+				</p>
+				<p style="margin-top: -0.5em;">
+					<span class="line-up-right" style="margin-top: 5px;"></span>
+					Use Turret Scale: <input id="cb-use-turret-scale" type="checkbox" data-save>
 					<span class="tooltip-ref help-circle" data-allow-hover>
 						<span class="text">?</span>
 						<span class="tooltip-space"></span>
@@ -89,43 +86,49 @@
 						<br>e.g. 7x7.6 = 21x23
 					</span>
 				</p>
-				<p>Color Space: <select class="select-color-space">
-					<option value="CIE2000">CIE2000</option>
-					<option value="RGB">RGB</option>
-				</select></p>
-				<p>Paint ID Font Size: <input class="input-font-size" type="number" min="1" value="12"></p>
+				<p>Color Space:
+					<select id="select-color-space" data-save>
+						<option value="CIE2000">CIE2000</option>
+						<option value="RGB">RGB</option>
+					</select>
+				</p>
+				<p>Paint ID Font Size: <input id="input-font-size" type="number" min="1" value="12" data-save></p>
 			</div>
 			<div>
-				<p>Draw Paint Id: <input class="cb-paint-id" type="checkbox" checked></p>
-				<p>Draw Paint Texture: <input class="cb-paint-texture" type="checkbox"></p>
-				<p>Pixel Size: <input class="input-pixel-size" type="number" min="1" value="22"></p>
-				<p>In-ship Coords: <span class="no-select">x<input class="input-coord-x" type="number" min="0" value="1" placeholder="--">,
-					y<input class="input-coord-y" type="number" min="0" value="1" placeholder="--"></span>
+				<p>Draw Paint Id: <input id="cb-paint-id" type="checkbox" checked autocomplete="off"></p>
+				<p>Draw Paint Texture: <input id="cb-paint-texture" type="checkbox" data-save></p>
+				<p>Pixel Size: <input id="input-pixel-size" type="number" min="1" value="22" data-save></p>
+				<p>In-ship Coords:
+					<span class="no-select">
+						x<input id="input-coord-x" type="number" min="0" value="1" placeholder="--" autocomplete="off">,
+						y<input id="input-coord-y" type="number" min="0" value="1" placeholder="--" autocomplete="off">
+					</span>
 					<span class="tooltip-ref help-circle" data-allow-hover>
 						<span class="text">?</span>
 						<span class="tooltip-space"></span>
 					</span>
-					<span class="tooltip-content debug-key-info">
+					<span id="debug-key-info" class="tooltip-content">
 						Coordinates of the bottom left square of the pixel art in game.
 						You can check coordinates by holding the <i>debug key</i> in a ship.
-						<br><br>Click on a paint in the result image to see its coords.
-						This helps you make sure you paint the correct squares.<br><br>
+						<br><br>This is used to show coords of a square in the result image (click a square).
+						Which helps you make sure you paint the correct squares in the ship.<br><br>
 					</span>
 				</p>
 			</div>
 		</div>
-		<button class="button-process">Process</button>
-		<h3 class="result-heading">Result <small class="result-info" style="font-weight: normal"></small></h3>
-		<small>Use the left mouse button and mouse wheel to zoom or move the image. <strong>Right click the image to Save, Copy etc.</strong></small>
-		<button class="button-reset-zoom">Reset Zoom</button>
-		<button class="button-show-resized" style="display: none; float: right;">Show Resized Image</button>
-		<p class="notice"></p>
-		<div class="result-container">
-			<div class="result" data-zoomist-src=""></div>
-			<div class="result-hover-square" style="display: none;"><span class="coords"></span></div>
+		<button id="button-process">Process</button>
+		<h3 id="result-heading">Result <small id="result-info" style="font-weight: normal"></small></h3>
+		<small>Use mouse buttons to move and zoom. Click a square to view its coords. <b>Right click the image to Save, Copy etc.</b></small>
+		<button id="button-reset-zoom">Reset Zoom</button>
+		<button id="button-show-resized" style="display: none;">Show Resized Image</button>
+		<p id="notice"></p>
+		<div id="result-container">
+			<div id="result" data-zoomist-src=""></div>
+			<div id="result-hover-square" style="display: none;"><span class="coords"></span></div>
 		</div>
 		<footer></footer>
 	</div>
-	<script src="./img2pixar/main.js" type="module"></script>
+	<script type="module" src="./main.js"></script>
+	<script defer src="/assets/goatc.min.js"></script>
 </body>
 </html>

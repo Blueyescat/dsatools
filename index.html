@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <head>
-	<base href="/dsatools/">
+	<meta charset="utf-8">
+	<meta name="description" content="Various tools for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
 	<meta property="og:type" content="website">
 	<meta property="og:title" content="DSA Tools">
-	<meta property="og:description" content="Tools for Deep Space Airships (drednot.io).">
+	<meta property="og:description" content="Various tools for the Deep Space Airships game.">
+	<!-- 'property' works for Discord, don't want to change pwa theme -->
 	<meta property="theme-color" content="#1f80b1">
 	<title>DSA Tools</title>
-	<link rel="stylesheet" href="./main.css">
-	<meta http-equiv="refresh" content="0; url=./img2pixar">
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-F4H914ZK0H"></script>
-	<script>
-		window.dataLayer = window.dataLayer || []
-		function gtag() { dataLayer.push(arguments) }
-		gtag("js", new Date())
-		gtag("config", "G-F4H914ZK0H")
-	</script>
+	<link rel="manifest" href="/app.webmanifest">
+	<script src="/assets/sw-reg.js"></script>
+	<link rel="icon" type="image/webp" href="/assets/icons/64.webp">
+	<link type="text/css" type="text/css" rel="stylesheet" href="/main.css">
+	<meta http-equiv="refresh" content="0; url=/bpeditor">
+	<script src="/main.js" type="module"></script>
+	<script defer src="/assets/goatc.min.js"></script>
 </head>
 </html>

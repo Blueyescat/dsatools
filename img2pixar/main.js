@@ -1,56 +1,56 @@
+globalThis.toolPath = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))
 const tool = {
 	name: "Image to Pixel Art",
 	credits: `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>,
-			inspired by <a href='https://github.com/ivstiv/pixelart-converter' target='_blank'>pixelart-converter</a>`
+			<br>Inspired by <a href='https://github.com/ivstiv/pixelart-converter' target='_blank'>pixelart-converter</a> by ivstiv.`
 }
 
-import { usesTouch, addTooltip } from "../main.js"
-const Pica = new window.pica()
+import("/assets/autoInputSave.js")
+import { usesTouch, addTooltip } from "/main.js"
 
-globalThis.toolPath = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))
+const Pica = new window.pica({ idle: 60000 })
 
 let worker
 if ("OffscreenCanvas" in window) worker = new Worker(globalThis.toolPath + "/worker.js")
 else await import(globalThis.toolPath + "/converter.js")
 
 const container = document.querySelector("#main-container")
-const inputFile = container.querySelector(".input-file>input")
-const inputWidth = container.querySelector(".input-width")
-const inputHeight = container.querySelector(".input-height")
-const cbUseTurretScale = container.querySelector(".cb-use-turret-scale")
-const cbDrawPaintId = container.querySelector(".cb-paint-id")
-const cbDrawPaintTexture = container.querySelector(".cb-paint-texture")
-const cbNoSmoothResizing = container.querySelector(".cb-no-smooth-resizing")
-const inputCoordX = container.querySelector(".input-coord-x")
-const inputCoordY = container.querySelector(".input-coord-y")
-const inputPixelSize = container.querySelector(".input-pixel-size")
-const inputFontSize = container.querySelector(".input-font-size")
-const selectColorSpace = container.querySelector(".select-color-space")
-const buttonProcess = container.querySelector(".button-process")
-const buttonShowResized = container.querySelector(".button-show-resized")
-const imgFilePreview = container.querySelector(".file-preview>img")
-const elFilePreviewName = container.querySelector(".file-preview>.name")
-const elFilePreviewSize = container.querySelector(".file-preview>.size")
-const elResultContainer = container.querySelector(".result-container")
-const elResult = elResultContainer.querySelector(".result-container .result")
-const elNotice = container.querySelector(".notice")
-const elResultInfo = container.querySelector(".result-info")
-const elResultHeading = container.querySelector(".result-heading")
-const elResultSquare = document.querySelector(".result-hover-square")
+const inputFile = document.getElementById("input-file")
+const inputWidth = document.getElementById("input-width")
+const inputHeight = document.getElementById("input-height")
+const cbUseTurretScale = document.getElementById("cb-use-turret-scale")
+const cbDrawPaintId = document.getElementById("cb-paint-id")
+const cbDrawPaintTexture = document.getElementById("cb-paint-texture")
+const cbNoSmoothResizing = document.getElementById("cb-no-smooth-resizing")
+const inputCoordX = document.getElementById("input-coord-x")
+const inputCoordY = document.getElementById("input-coord-y")
+const inputPixelSize = document.getElementById("input-pixel-size")
+const inputFontSize = document.getElementById("input-font-size")
+const selectColorSpace = document.getElementById("select-color-space")
+const buttonProcess = document.getElementById("button-process")
+const buttonShowResized = document.getElementById("button-show-resized")
+const imgFilePreview = document.querySelector("#preview>img")
+const elFilePreviewName = document.querySelector("#preview>.name")
+const elFilePreviewSize = document.querySelector("#preview>.size")
+const elResultContainer = document.getElementById("result-container")
+const elResult = document.getElementById("result")
+const elNotice = document.getElementById("notice")
+const elResultInfo = document.getElementById("result-info")
+const elResultHeading = document.getElementById("result-heading")
+const elResultSquare = document.getElementById("result-hover-square")
 const elResultSquareCoords = elResultSquare.querySelector(".coords")
-
 const canvas = document.createElement("canvas")
-const canvasCtx = canvas.getContext("2d")
+const canvasCtx = canvas.getContext("2d", { willReadFrequently: true })
 
 let noticeTimeoutId, resultZoomist, resultDragging, resizedImageBlob
 let hasSetWidth, hasSetHeight, hasChosenImage
 let displayPixelSize, displayWidth, displayHeight, displayPaintHeight
 let inShipCoordX = 1, inShipCoordY = 1
 let resizeCache = {}
-let image = new Image()
+const image = new Image()
 
-window.addEventListener("paste", function (event) {
-	let file = event.clipboardData.files?.[0]
+window.addEventListener("paste", e => {
+	const file = e.clipboardData.files?.[0]
 	if (!file || !file.type.includes("image/")) return
 	const dt = new DataTransfer()
 	dt.items.add(file)
@@ -58,36 +58,36 @@ window.addEventListener("paste", function (event) {
 	inputFile.dispatchEvent(new Event("change"))
 })
 
-window.addEventListener("dragover", function (event) {
-	event.preventDefault()
-	container.style.outline = "2px dashed #2291c9"
+window.addEventListener("dragover", e => {
+	e.preventDefault()
+	container.style.outline = "2px dashed var(--blue)"
 })
-window.addEventListener("dragleave", function (event) {
-	if (!event.relatedTarget) container.style.outline = ""
+window.addEventListener("dragleave", e => {
+	if (!e.relatedTarget) container.style.outline = ""
 })
-window.addEventListener("drop", function (event) {
-	event.preventDefault()
+window.addEventListener("drop", e => {
+	e.preventDefault()
 	container.style.outline = ""
-	if (!event.dataTransfer.files.length) return
-	inputFile.files = event.dataTransfer.files
+	if (!e.dataTransfer.files.length) return
+	inputFile.files = e.dataTransfer.files
 	inputFile.dispatchEvent(new Event("change"))
 })
 
-inputFile.addEventListener("change", function () {
-	let file = this.files?.[0]
+inputFile.addEventListener("change", () => {
+	const file = inputFile.files?.[0]
 	if (!file) {
 		hasChosenImage = false
 		inputFile.style.backgroundImage = null
 		return
 	}
 	if (!file.type.includes("image/"))
-		return this.value = null
+		return inputFile.value = null
 	loadBaseImage(URL.createObjectURL(file), file.name)
 })
 
 async function loadBaseImage(src, fileName) {
 	image.src = src
-	let result = await new Promise(resolve => {
+	const result = await new Promise(resolve => {
 		image.onerror = () => resolve(false)
 		image.onload = () => resolve(true)
 	})
@@ -108,7 +108,7 @@ async function loadBaseImage(src, fileName) {
 	autoFillDims(cbUseTurretScale.checked)
 }
 
-cbUseTurretScale.addEventListener("change", function () {
+cbUseTurretScale.addEventListener("change", () => {
 	if (hasSetWidth || hasSetHeight || !hasChosenImage) return
 	autoFillDims(this.checked)
 })
@@ -126,7 +126,7 @@ function autoFillDims(turretScale) {
 
 inputWidth.addEventListener("input", function () {
 	if (!hasSetHeight) {
-		let fit = calAspectRatioFit(image.width, image.height, parseFloat(this.value), image.height).height
+		const fit = calcAspectRatioFit(image.width, image.height, parseFloat(this.value), image.height).height
 		if (isNaN(fit)) return
 		inputHeight.value = cbUseTurretScale.checked ? toNearestTurretScale(fit) : Math.round(fit)
 	}
@@ -135,17 +135,17 @@ inputWidth.addEventListener("input", function () {
 
 inputHeight.addEventListener("input", function () {
 	if (!hasSetWidth) {
-		let fit = calAspectRatioFit(image.width, image.height, image.width, parseFloat(this.value)).width
+		const fit = calcAspectRatioFit(image.width, image.height, image.width, parseFloat(this.value)).width
 		if (isNaN(fit)) return
 		inputWidth.value = cbUseTurretScale.checked ? toNearestTurretScale(fit) : Math.round(fit)
 	}
 	hasSetHeight = true
 })
 
-inputCoordX.addEventListener("input", function () { inShipCoordX = parseInt(this.value) })
-inputCoordY.addEventListener("input", function () { inShipCoordY = parseInt(this.value) })
+inputCoordX.addEventListener("input", () => inShipCoordX = parseInt(inputCoordX.value))
+inputCoordY.addEventListener("input", () => inShipCoordY = parseInt(inputCoordX.value))
 
-buttonProcess.addEventListener("click", async function () {
+buttonProcess.addEventListener("click", async () => {
 	if (!hasChosenImage)
 		return notice("You haven't chosen an image.")
 	const width = cbUseTurretScale.checked ? Math.round(parseFloat(inputWidth.value) * 3) : parseInt(inputWidth.value)
@@ -164,10 +164,10 @@ buttonProcess.addEventListener("click", async function () {
 	canvas.width = width
 	canvas.height = height
 	elResultInfo.textContent = "..."
-	let start = performance.now()
+	const start = performance.now()
 
-	let cacheKey = "" + cbNoSmoothResizing.checked + width + height
-	let cachedBlob = resizeCache[cacheKey]
+	const cacheKey = "" + cbNoSmoothResizing.checked + width + height
+	const cachedBlob = resizeCache[cacheKey]
 	if (!cachedBlob && image.width == width && image.height == height) {
 		canvasCtx.drawImage(image, 0, 0, canvas.width, canvas.height)
 		buttonShowResized.style.display = "none"
@@ -183,7 +183,7 @@ buttonProcess.addEventListener("click", async function () {
 		buttonShowResized.style.display = ""
 	}
 
-	let result = await process({
+	const result = await process({
 		colorSpace: selectColorSpace.value,
 		imageData: canvasCtx.getImageData(0, 0, canvas.width, canvas.height),
 		pixelSize: pixelSize,
@@ -192,7 +192,7 @@ buttonProcess.addEventListener("click", async function () {
 		drawPaintId: cbDrawPaintId.checked
 	})
 
-	let imageData = result.imageData
+	const imageData = result.imageData
 	displayPixelSize = pixelSize
 	displayPaintHeight = height
 	elResultInfo.textContent = `${width}x${height}sq - ${imageData.width}x${imageData.height}px - ${Math.round(performance.now() - start)}ms`
@@ -221,7 +221,7 @@ buttonProcess.addEventListener("click", async function () {
 			},
 			ready() {
 				elResultHeading.scrollIntoView({ behavior: "smooth" })
-				let img = elResult.getElementsByClassName("zoomist-image")[0]
+				const img = elResult.getElementsByClassName("zoomist-image")[0]
 				img.style.pointerEvents = "unset" // zoomist makes it none, which is bad
 				img.draggable = false // alternative for ^
 			}
@@ -234,7 +234,7 @@ async function process(data) {
 	if (worker) {
 		worker.postMessage(data)
 		result = await new Promise(resolve =>
-			worker.addEventListener("message", (event) => resolve(event.data.imageData), { once: true })
+			worker.addEventListener("message", e => resolve(e.data.imageData), { once: true })
 		)
 	} else {
 		result = await globalThis.img2pixar(null, data)
@@ -242,30 +242,31 @@ async function process(data) {
 	return result
 }
 
-elResult.addEventListener(usesTouch ? "touchend" : "click", function (event) {
-	let thing = event.changedTouches?.item(0) ?? event
-	let target = thing.target
+elResult.addEventListener(usesTouch ? "touchend" : "click", e => {
+	const thing = e.changedTouches?.item(0) ?? e
+	const target = thing.target
 	if (!target.classList.contains("zoomist-image") || resultDragging)
 		return
-	let clientX = thing.clientX
-	let clientY = thing.clientY
+	const clientX = thing.clientX
+	const clientY = thing.clientY
 	// calculate coords of the hovered on paint pixel on the image (relative to zoom)
-	let img = target
-	let imgRect = img.getBoundingClientRect()
-	let x = clientX - imgRect.left
-	let y = clientY - imgRect.top
-	let resizeRatio = Math.min(img.width / displayWidth, img.height / displayHeight)
-	let scaledPixelSize = displayPixelSize * resizeRatio
-	let paintX = Math.floor(x / scaledPixelSize)
-	let paintY = Math.floor(y / scaledPixelSize)
-	if (paintX < 0 || paintY < 0) return elResultSquare.style.display = "none"
+	const img = target
+	const imgRect = img.getBoundingClientRect()
+	const x = clientX - imgRect.left
+	const y = clientY - imgRect.top
+	const resizeRatio = Math.min(img.width / displayWidth, img.height / displayHeight)
+	const scaledPixelSize = displayPixelSize * resizeRatio
+	const paintX = Math.floor(x / scaledPixelSize)
+	const paintY = Math.floor(y / scaledPixelSize)
+	if (paintX < 0 || paintY < 0)
+		return elResultSquare.style.display = "none"
 
 	// calculate position for the square element
-	let contRect = elResultContainer.getBoundingClientRect()
-	let paintPixelLeft = (imgRect.left - contRect.left) + (paintX ?? 1) * scaledPixelSize
-	let paintPixelTop = (imgRect.top - contRect.top) + (paintY ?? 1) * scaledPixelSize
-	let inShipX = inShipCoordX + paintX
-	let inShipY = displayPaintHeight - (-inShipCoordY + 1 + paintY)
+	const contRect = elResultContainer.getBoundingClientRect()
+	const paintPixelLeft = (imgRect.left - contRect.left) + (paintX ?? 1) * scaledPixelSize
+	const paintPixelTop = (imgRect.top - contRect.top) + (paintY ?? 1) * scaledPixelSize
+	const inShipX = inShipCoordX + paintX
+	const inShipY = displayPaintHeight - (-inShipCoordY + 1 + paintY)
 	elResultSquare.style.display = ""
 	elResultSquare.style.width = elResultSquare.style.height = scaledPixelSize + "px"
 	elResultSquare.style.left = paintPixelLeft + "px"
@@ -273,7 +274,7 @@ elResult.addEventListener(usesTouch ? "touchend" : "click", function (event) {
 
 	// calculate position for the coords element
 	elResultSquareCoords.textContent = inShipX + "," + inShipY
-	let resultRect = elResultSquare.getBoundingClientRect()
+	const resultRect = elResultSquare.getBoundingClientRect()
 	if (resultRect.bottom + 20 >= contRect.bottom) {
 		elResultSquareCoords.style.top = "-20px"
 		elResultSquareCoords.style.bottom = "unset"
@@ -296,39 +297,38 @@ elResult.addEventListener(usesTouch ? "touchend" : "click", function (event) {
 	}
 })
 
-;(async () => {
+void async function () {
 	let html = ""
 	if (navigator.keyboard) {
 		await navigator.keyboard.getLayoutMap().then((map) => {
-			html += `(The debug key should be \`<strong>${map.get("Slash")}</strong>\` for your locale)`
+			html += `(The debug key should be <b>${map.get("Slash")}</b> for your locale)`
 		})
 	} else {
-		html += "(The debug key is Slash <strong>/</strong>, might be something else depending on your locale, like the period <strong>.</strong>)"
+		html += "(The debug key is Slash <b>/</b>, might be something else depending on your locale, like the period <b>.</b>)"
 	}
-	container.querySelector(".debug-key-info").innerHTML += html
-})()
+	document.getElementById("debug-key-info").insertAdjacentHTML("beforeend", html)
+}()
 
-container.querySelector(".button-reset-zoom").addEventListener("click", () => resultZoomist?.reset())
+document.getElementById("button-reset-zoom").addEventListener("click", () => resultZoomist?.reset())
 
-buttonShowResized.addEventListener("click", () => window.open(URL.createObjectURL(resizedImageBlob), "_blank"))
+buttonShowResized.addEventListener("click", () =>
+	window.open(URL.createObjectURL(resizedImageBlob), "_blank")
+)
 
-;[inputWidth, inputHeight, inputFontSize, inputPixelSize, inputCoordX, inputCoordY].forEach(el => {
-	el.addEventListener("focus", function () { this.select() })
-})
-
-document.querySelectorAll(".tooltip-ref").forEach(addTooltip)
+for (const el of [inputWidth, inputHeight, inputFontSize, inputPixelSize, inputCoordX, inputCoordY])
+	el.addEventListener("focus", () => el.select())
 
 function toNearestTurretScale(n) {
-	let int = Math.trunc(n)
-	let dec = n - int
+	const int = Math.trunc(n)
+	const dec = n - int
 	if (dec == 0) return int
 	if (dec <= 1 / 3) return int + 0.3
 	if (dec <= 1 / 3 * 2) return int + 0.6
 	return int + 1
 }
 
-function calAspectRatioFit(w, h, maxW, maxH) {
-	let ratio = Math.min(maxW / w, maxH / h)
+function calcAspectRatioFit(w, h, maxW, maxH) {
+	const ratio = Math.min(maxW / w, maxH / h)
 	return { width: w * ratio, height: h * ratio }
 }
 
@@ -339,5 +339,6 @@ function notice(text = "") {
 	noticeTimeoutId = setTimeout(() => elNotice.textContent = "", 8000)
 }
 
+document.querySelectorAll(".tooltip-ref").forEach(addTooltip)
 document.querySelector("header nav .dropdown>.text").innerHTML = tool.name
-if (tool.credits) container.querySelector("footer .credits").innerHTML = `${tool.name} ${tool.credits} -`
+if (tool.credits) document.getElementById("credits").innerHTML = tool.name + " " + tool.credits

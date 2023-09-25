@@ -270,13 +270,14 @@ export function replace(bp, options) {
 
 function resolveItemInputs(inputs) {
 	const output = []
-	/** @type {Set<"block"|"placeable"|"nonplaceable"|"bigmac"|"smallmac"|"hull">} */
+	/** @type {Set<"block"|"buildable"|"nonbuildable"|"mac"|"bigmac"|"smallmac"|"hull">} */
 	const categories = new Set()
 
 	for (const s of new Set(inputs)) {
 		if (s == "block") categories.add("block")
-		else if (s == "placeable") categories.add("placeable")
-		else if (s == "non-placeable" || s == "nonplaceable") categories.add("nonplaceable")
+		else if (s == "buildable") categories.add("buildable")
+		else if (s == "non-buildable" || s == "nonbuildable") categories.add("nonbuildable")
+		else if (s == "machine") categories.add("mac")
 		else if (s == "big machine") categories.add("bigmac")
 		else if (s == "1x1 machine" || s == "small machine") categories.add("smallmac")
 		else if (s == "hull mounted" || s == "hull-mounted" || s == "hull") categories.add("hull")
@@ -290,8 +291,9 @@ function resolveItemInputs(inputs) {
 	if (categories.size) {
 		for (const item of Item.getMap().values()) {
 			if (categories.has("block") && item.isBlock
-				|| categories.has("placeable") && item.isBuildable
-				|| categories.has("nonplaceable") && !item.isBuildable
+				|| categories.has("buildable") && item.isBuildable
+				|| categories.has("nonbuildable") && !item.isBuildable
+				|| categories.has("mac") && item.isBuildable && !item.isBlock
 				|| categories.has("bigmac") && item.isBuildable && !item.isBlock && isBigMac(item)
 				|| categories.has("smallmac") && item.isBuildable && !item.isBlock && !isBigMac(item)
 				|| categories.has("hull") && item.isBuildable && item.buildInfo?.[0]?.require_blocks?.[0].block.includes("HULL")

@@ -196,10 +196,15 @@ export function rotate(bp, angle) {
 
 	function rotateC(x, y) {
 		return [
-			((x - cX) * cos) - ((y - cY) * sin) + cX,
-			((x - cX) * sin) + ((y - cY) * cos) + cY
+			toFixed(((x - cX) * cos) - ((y - cY) * sin) + cX),
+			toFixed(((x - cX) * sin) + ((y - cY) * cos) + cY)
 		]
 	}
+}
+
+function toFixed(n, digits = 10) {
+	const f = 10 ** digits 
+	return Math.round(n * f) / f
 }
 
 /**

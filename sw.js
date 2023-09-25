@@ -1,5 +1,5 @@
 // changing this file makes a browser update the active SW, and changing cacheName makes it re-cache all files
-const cacheName = "dsatools-v1"
+const cacheName = "dsatools-v2"
 
 const cacheUrls = ["/", ..."items/ main.css main.js app.webmanifest https://x.dsatools.workers.dev?https://pub.drednot.io/test/econ/item_schema.json".split(" ")]
 

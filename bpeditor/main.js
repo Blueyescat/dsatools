@@ -6,10 +6,9 @@ const tool = {
 }
 
 const autoInputSave = import("/assets/autoInputSave.js")
-import { addTooltip } from "/main.js"
-import items from "./assets/items.js"
-import { BuildCmd, PREFIX, decode, encode } from "../assets/lib/dsabp-js/index.min.js"
+import { BuildCmd, Item, PREFIX, decode, encode } from "../assets/lib/dsabp-js/index.min.js"
 import * as operations from "./operations.js"
+import { addTooltip } from "/main.js"
 
 const inputBp = document.getElementById("bp-input")
 const opRadios = Array.from(document.getElementById("chips-operation").querySelectorAll("input"))
@@ -113,13 +112,15 @@ document.getElementById("rotate-angle-buttons").addEventListener("click", e => {
 	inputRotateAngle.dispatchEvent(new Event("change"))
 })
 
-// load item list
+// load replace item list
 void function () {
 	const box = document.getElementById("replace-item-list")
-	const placeable = [], item = []
-	for (const id of items.ids)
-		(items.isPlaceable(id) ? placeable : item).push(`${id.padStart(3, "0")}: ${items.getName(id)}`)
-	box.innerHTML += placeable.join("<br>") + "<br><br>" + item.join("<br>")
+	const buildables = [], items = []
+	for (const item of Item.getMap().values()) {
+		if (item != Item.NULL)
+			(item.isBuildable ? buildables : items).push(`${item.id.toString().padStart(3, "0")}: ${item.name}`)
+	}
+	box.innerHTML += buildables.join("<br>") + "<br><br>" + items.join("<br>")
 }()
 
 // result buttons

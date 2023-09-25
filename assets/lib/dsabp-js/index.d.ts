@@ -66,41 +66,567 @@ export declare class BuildBits {
 	/** @returns A new instance with the same bits. */
 	clone(): BuildBits;
 }
+export interface C<T> {
+	new (...args: any[]): T;
+	maps: any;
+	getMap: any;
+	getReverseMap: any;
+}
+/**
+ * An alternative to TS Enums. Simple, efficient, and compatible with IntelliSense.
+ *
+ * An enum constant is an instance of the derived class. References to instances are stored in maps for fast lookups.
+ * The derived class can add static or non-static members to store more data or to have more methods on the enum.
+ * A constant must have a "main value" (enumValue) that can be anything (preferably a primitive) and is used with the reverse mapping.
+ * Easy to add NoReverseEnum and NoValueEnum if ever needed.
+ */
+/** @hidden */
+export declare class Enum<V> {
+	/** @hidden */
+	static readonly maps: Map<string, [
+		Map<string, Enum<any>>,
+		Map<any, string>
+	]>;
+	/**
+	 * Enum names to constant instances.
+	 *
+	 * Can be used to get the names and values of all constants in this enum.
+	 */
+	static getMap<CT>(this: C<CT>): Map<string, CT>;
+	/** Enum values to names. */
+	static getReverseMap<CT extends {
+		enumValue: any;
+	}>(this: C<CT>): Map<CT["enumValue"], string>;
+	/**
+	 * Returns a constant with the specified name, or undefined if not found. (Case-sensitive)
+	 *
+	 * Shortcut to using {@link getMap}.
+	 */
+	static getByName<CT>(this: C<CT>, name: string): CT | undefined;
+	/**
+	 * Returns a constant with the specified value, or undefined if not found.
+	 *
+	 * Shortcut to using {@link getReverseMap} and {@link getMap}.
+	 */
+	static getByValue<CT extends {
+		enumValue: any;
+	}>(this: C<CT>, value: CT["enumValue"]): CT | undefined;
+	/** @hidden */
+	static end(): void;
+	constructor(value: V);
+	/** The name of the constant, i.e. the member name. */
+	enumName: string;
+	/** The value of the constant. */
+	enumValue: V;
+	/** @returns "Enum.MEMBER" */
+	toString(): string;
+}
+/**
+ * The item names, IDs and data are taken directly from the game source.
+ *
+ * The item data may be unstable because it is not edited or checked, including the
+ * property names. If you use it, it is up to you to test it and handle the game changes.
+ * The major version won't be incremented for any breaking changes to it.
+ *
+ * <small>Generated using test.drednot.io version: `Fri Sep 22 17:00:10 MDT 2023 / 4c521f8`</small>
+ */
+export declare class Item extends Enum<number> {
+	readonly name: string;
+	readonly description: string;
+	readonly stackable: boolean;
+	readonly rarity: number;
+	readonly image?: string;
+	/**
+	 * Each object in this array represents build info with different rotations, usually 1 or 2.
+	 *
+	 * The object will have a `buildDirection` property, except when there is only 1 build info.
+	 */
+	readonly buildInfo?: Array<Partial<{
+		bounds: {
+			x: number;
+			y: number;
+		};
+		shape: {
+			verts: {
+				x: number;
+				y: number;
+			}[];
+		};
+		allow_non_solids: boolean;
+		image: string;
+		image_only: boolean;
+		snap_y: boolean;
+		offset: {
+			x: number;
+			y: number;
+		};
+		require_blocks: {
+			x: number;
+			y: number;
+			block: "_BUILD_SURFACE" | "AIR" | "HULL_CORNER" | "HULL_H" | "HULL_V" | "INTERIOR_BLOCK" | "LADDER" | "WALKWAY" | "ITEM_NET" | "RAMP_1" | "RAMP_2" | "RAMP_3" | "RAMP_4" | "COLOR_PANEL" | "HYPER_RUBBER" | "ICE_GLASS" | "ANNIHILATOR";
+		}[];
+		allow_solids: boolean;
+		snap_x: boolean;
+		buildDirection: "HORIZONTAL" | "VERTICAL";
+		allow_world: boolean;
+		block: number;
+		block_shaped: boolean;
+		block_is_colored: boolean;
+		allow_any: boolean;
+		build_angle: "Any" | "Fixed";
+		is_lockdown_override: boolean;
+		offset2: {
+			x: number;
+			y: number;
+		};
+	}>>;
+	readonly blacklist_autobuild?: boolean;
+	readonly fab_type?: "Legacy" | "Starter" | "Munitions" | "Engineering" | "Machine" | "Equipment";
+	constructor(id: any, name: any, description: any, stackable: any, rarity: any, image?: any, buildInfo?: any, blacklist_autobuild?: any, fab_type?: any);
+	/** The value of the constant (in this case, the ID of the item). */
+	enumValue: number;
+	/** The ID of the item. Alias to {@link enumValue}. */
+	get id(): number;
+	get isBuildable(): boolean;
+	get isBlock(): boolean;
+	/** Returns an {@link Item} with the specified ID, or undefined if not found. Alias to {@link Item.getByValue | getByValue}. */
+	static getById(id: number): Item;
+	static NULL: Item;
+	/**Iron*/
+	static RES_METAL: Item;
+	/**Explosives*/
+	static RES_GUNPOWDER: Item;
+	/**Hyper Rubber*/
+	static RES_HYPER_RUBBER: Item;
+	/**Flux Crystals*/
+	static RES_FLUX: Item;
+	/**Thruster Fuel*/
+	static RES_FUEL: Item;
+	/**Scrap Metal*/
+	static SCRAP_METAL: Item;
+	/**Volleyball*/
+	static BALL_VOLLEY: Item;
+	/**Golden Volleyball*/
+	static BALL_VOLLEY_GOLD: Item;
+	/**Basketball*/
+	static BALL_BASKET: Item;
+	/**Golden Basketball*/
+	static BALL_BASKET_GOLD: Item;
+	/**Beach Ball*/
+	static BALL_BEACH: Item;
+	/**Football*/
+	static BALL_SOCCER: Item;
+	/**Wrench*/
+	static WRENCH: Item;
+	/**Item Shredder*/
+	static SHREDDER: Item;
+	/**Golden Item Shredder*/
+	static SHREDDER_GOLD: Item;
+	/**Repair Tool*/
+	static REPAIR_TOOL: Item;
+	/**Handheld Pusher*/
+	static HAND_PUSHER: Item;
+	/**Ship Shield Booster*/
+	static SHIELD_BOOSTER: Item;
+	/**Ship Embiggener*/
+	static SHIP_EMBIGGENER: Item;
+	/**Ship Shrinkinator*/
+	static SHIP_SHRINKINATOR: Item;
+	/**Backpack*/
+	static EQUIPMENT_BACKPACK: Item;
+	/**Speed Skates*/
+	static EQUIPMENT_SPEED_SKATES: Item;
+	/**Booster Boots*/
+	static EQUIPMENT_BOOSTER_BOOTS: Item;
+	/**Launcher Gauntlets*/
+	static EQUIPMENT_LAUNCHER_GAUNTLETS: Item;
+	/**Construction Gauntlets*/
+	static EQUIPMENT_CONSTRUCTION_GAUNTLETS: Item;
+	/**Rocket Pack*/
+	static EQUIPMENT_ROCKET_PACK: Item;
+	/**Hover Pack*/
+	static EQUIPMENT_HOVER_PACK: Item;
+	/**Manifest Scanner*/
+	static SCANNER_MANIFEST: Item;
+	/**BoM Scanner*/
+	static SCANNER_BOM: Item;
+	/**Starter Wrench*/
+	static WRENCH_STARTER: Item;
+	/**Starter Shredder*/
+	static SHREDDER_STARTER: Item;
+	/**Hand Cannon*/
+	static HAND_CANNON: Item;
+	/**Blueprint Scanner*/
+	static SCANNER_BLUEPRINT: Item;
+	/**Sandbox RCD*/
+	static RCD_SANDBOX: Item;
+	/**Flux RCD*/
+	static RCD_FLUX: Item;
+	/**Shield Core*/
+	static SHIELD_CORE: Item;
+	/**Standard Ammo*/
+	static AMMO_STANDARD: Item;
+	/**ScatterShot Ammo*/
+	static AMMO_SCATTER: Item;
+	/**Flak Ammo*/
+	static AMMO_FLAK: Item;
+	/**Sniper Ammo*/
+	static AMMO_SNIPER: Item;
+	/**Punch Ammo*/
+	static AMMO_PUNCH: Item;
+	/**Yank Ammo*/
+	static AMMO_YANK: Item;
+	/**Slug Ammo*/
+	static AMMO_SLUG: Item;
+	/**Trash Ammo*/
+	static AMMO_TRASH: Item;
+	/**Booster Fuel (Low Grade)*/
+	static FUEL_BOOSTER_LOW: Item;
+	/**Booster Fuel (High Grade)*/
+	static FUEL_BOOSTER_HIGH: Item;
+	/**Void Orb*/
+	static VOID_ORB: Item;
+	/**Turret Booster - Rapid Fire*/
+	static TURRET_BOOSTER_RAPID: Item;
+	/**Turret Booster - Rapid Fire (Depleted)*/
+	static TURRET_BOOSTER_RAPID_USED: Item;
+	/**Turret Booster - Preservation*/
+	static TURRET_BOOSTER_PRESERVATION: Item;
+	/**Turret Booster - Preservation (Depleted)*/
+	static TURRET_BOOSTER_PRESERVATION_USED: Item;
+	/**Helm (Packaged)*/
+	static HELM: Item;
+	/**Helm (Starter, Packaged)*/
+	static HELM_STARTER: Item;
+	/**Comms Station (Packaged)*/
+	static COMMS_STATION: Item;
+	/**Sign (Packaged)*/
+	static SIGN: Item;
+	/**Spawn Point (Packaged)*/
+	static SPAWN_POINT: Item;
+	/**Door (Packaged)*/
+	static DOOR: Item;
+	/**Cargo Hatch (Packaged)*/
+	static ITEM_HATCH: Item;
+	/**Cargo Hatch (Starter, Packaged)*/
+	static ITEM_HATCH_STARTER: Item;
+	/**Cargo Ejector (Packaged)*/
+	static ITEM_EJECTOR: Item;
+	/**Turret Controller (Packaged)*/
+	static TURRET_CONTROLLER: Item;
+	/**RC Turret (Packaged)*/
+	static TURRET_REMOTE: Item;
+	/**RC Turret (Starter, Packaged)*/
+	static TURRET_REMOTE_STARTER: Item;
+	/**Burst Turret (Packaged)*/
+	static TURRET_BURST: Item;
+	/**Auto Turret (Packaged)*/
+	static TURRET_AUTO: Item;
+	/**Thruster (Packaged)*/
+	static THRUSTER: Item;
+	/**Thruster (Starter, Packaged)*/
+	static THRUSTER_STARTER: Item;
+	/**Iron Block*/
+	static BLOCK: Item;
+	/**Hyper Rubber Block*/
+	static BLOCK_HYPER_RUBBER: Item;
+	/**Hyper Ice Block*/
+	static BLOCK_ICE_GLASS: Item;
+	/**Ladder*/
+	static BLOCK_LADDER: Item;
+	/**Walkway*/
+	static BLOCK_WALKWAY: Item;
+	/**Item Net*/
+	static BLOCK_ITEM_NET: Item;
+	/**Paint*/
+	static PAINT: Item;
+	/**Expando Box (Packaged)*/
+	static EXPANDO_BOX: Item;
+	/**Safety Anchor*/
+	static FREEPORT_ANCHOR: Item;
+	/**Pusher (Packaged)*/
+	static PUSHER: Item;
+	/**Item Launcher (Packaged)*/
+	static ITEM_LAUNCHER: Item;
+	/**DEPRECATED ITEM*/
+	static LOADER: Item;
+	/**Recycler (Packaged)*/
+	static RECYCLER: Item;
+	/**Fabricator (Legacy, Packaged)*/
+	static FABRICATOR_GOLD: Item;
+	/**Fabricator (Starter, Packaged)*/
+	static FABRICATOR_STARTER: Item;
+	/**Fabricator (Munitions, Packaged)*/
+	static FABRICATOR_MUNITIONS: Item;
+	/**Fabricator (Engineering, Packaged)*/
+	static FABRICATOR_ENGINEERING: Item;
+	/**Fabricator (Machine, Packaged)*/
+	static FABRICATOR_MACHINE: Item;
+	/**Fabricator (Equipment, Packaged)*/
+	static FABRICATOR_EQUIPMENT: Item;
+	/**Loader (Packaged)*/
+	static LOADER_NEW: Item;
+	/**Lockdown Override Unit*/
+	static LOCKDOWN_OVERRIDE_GREEN: Item;
+	/**Annihilator Tile*/
+	static BLOCK_ANNIHILATOR: Item;
+	/**Fluid Tank*/
+	static FLUID_TANK: Item;
+	/**Shield Generator*/
+	static SHIELD_GENERATOR: Item;
+	/**Shield Projector*/
+	static SHIELD_PROJECTOR: Item;
+	/**Enhanced Turret Controller*/
+	static TURRET_CONTROLLER_NEW: Item;
+	/**Bulk Ejector (Packaged)*/
+	static BULK_EJECTOR: Item;
+	/**Bulk Loading Bay Designator (Packaged)*/
+	static BULK_BAY_MARKER: Item;
+	/**Navigation Unit (Starter, Packaged)*/
+	static NAV_UNIT: Item;
+	/**Eternal Bronze Wrench*/
+	static ETERNAL_WRENCH_BRONZE: Item;
+	/**Eternal Silver Wrench*/
+	static ETERNAL_WRENCH_SILVER: Item;
+	/**Eternal Gold Wrench*/
+	static ETERNAL_WRENCH_GOLD: Item;
+	/**Eternal Flux Wrench*/
+	static ETERNAL_WRENCH_FLUX: Item;
+	/**Eternal Platinum Wrench*/
+	static ETERNAL_WRENCH_PLATINUM: Item;
+	/**Gold Null Trophy*/
+	static TROPHY_NULL: Item;
+	/**Bug Hunter Trophy*/
+	static TROPHY_BUG_HUNTER: Item;
+	/**Silver Null Trophy*/
+	static TROPHY_NULL_SILVER: Item;
+	/**Bronze Wrench*/
+	static PAT_WRENCH_BRONZE: Item;
+	/**Silver Wrench*/
+	static PAT_WRENCH_SILVER: Item;
+	/**Gold Wrench*/
+	static PAT_WRENCH_GOLD: Item;
+	/**Platinum Wrench*/
+	static PAT_WRENCH_PLATINUM: Item;
+	/**Flux Wrench*/
+	static PAT_WRENCH_FLUX: Item;
+	/**Lesser Cap*/
+	static COS_LESSER_CAP: Item;
+	/**Goofy Glasses*/
+	static COS_GOOFY_GLASSES: Item;
+	/**Shades*/
+	static COS_SHADES: Item;
+	/**Top Hat*/
+	static COS_TOP_HAT: Item;
+	/**Demon Horns*/
+	static COS_HORNS: Item;
+	/**Alien Mask*/
+	static COS_MASK_ALIEN: Item;
+	/**Clown Mask*/
+	static COS_MASK_CLOWN: Item;
+	/**Goblin Mask*/
+	static COS_MASK_GOBLIN: Item;
+	/**Pumpkin*/
+	static COS_PUMPKIN: Item;
+	/**Witch Hat*/
+	static COS_WITCH_HAT: Item;
+	/**Wild Gremlin (Red)*/
+	static GREMLIN_RED: Item;
+	/**Wild Gremlin (Orange)*/
+	static GREMLIN_ORANGE: Item;
+	/**Wild Gremlin (Yellow)*/
+	static GREMLIN_YELLOW: Item;
+}
+/**
+ * The shape names and vertices are taken directly from the game source. The names may not be
+ * descriptive, but you don't usually need to refer to them by name. Additionally, the constants
+ * have a comment that visually represents the shape with braille ascii art, generated from the vertices.
+ *
+ * The {@link vertices} are sorted to prevent them from overlapping.
+ *
+ * <small>Generated using test.drednot.io version: `Fri Sep 22 17:00:10 MDT 2023 / 4c521f8`</small>
+ */
+export declare class Shape extends Enum<number> {
+	readonly vertices: {
+		x: number;
+		y: number;
+	}[];
+	constructor(v: number, vertices: {
+		x: number;
+		y: number;
+	}[]);
+	/**⣿⣿⣿⣿\
+	   ⣿⣿⣿⣿*/
+	static BLOCK: Shape;
+	/**⣷⣄     \
+	   ⣿⣿⣷⣄*/
+	static RAMP_UR: Shape;
+	/**⣿⣿⡿⠋\
+	   ⡿⠋    &#8198;*/
+	static RAMP_DR: Shape;
+	/**⠈⠻⣿⣿\
+	 *       ⠈⠻*/
+	static RAMP_DL: Shape;
+	/**&#8198;    ⢀⣴\
+	   ⢀⣴⣿⣿*/
+	static RAMP_UL: Shape;
+	/**&#8198;        \
+	   ⣿⣿⣿⣿*/
+	static SLAB_U: Shape;
+	/**⣿⣿     \
+	   ⣿⣿    &#8198;*/
+	static SLAB_R: Shape;
+	/**⣿⣿⣿⣿\
+	 *          &#8198;*/
+	static SLAB_D: Shape;
+	/**&#8198;    ⣿⣿\
+	 *       ⣿⣿*/
+	static SLAB_L: Shape;
+	/**&#8198;        \
+	   ⣷⣦⣄⡀*/
+	static HALF_RAMP_1_U: Shape;
+	/**⣿⠏     \
+	   ⠏      &#8198;*/
+	static HALF_RAMP_1_R: Shape;
+	/**⠈⠙⠻⢿\
+	 *          &#8198;*/
+	static HALF_RAMP_1_D: Shape;
+	/**&#8198;      ⣰\
+	 *       ⣰⣿*/
+	static HALF_RAMP_1_L: Shape;
+	/**⣷⣦⣄⡀\
+	   ⣿⣿⣿⣿*/
+	static HALF_RAMP_2_U: Shape;
+	/**⣿⣿⣿⠏\
+	   ⣿⣿⠏  &#8198;*/
+	static HALF_RAMP_2_R: Shape;
+	/**⣿⣿⣿⣿\
+	   ⠈⠙⠻⢿*/
+	static HALF_RAMP_2_D: Shape;
+	/**&#8198;  ⣰⣿⣿\
+	   ⣰⣿⣿⣿*/
+	static HALF_RAMP_2_L: Shape;
+	/**&#8198;        \
+	   ⢀⣠⣴⣾*/
+	static HALF_RAMP_1_UI: Shape;
+	/**⣆       \
+	   ⣿⣆    &#8198;*/
+	static HALF_RAMP_1_RI: Shape;
+	/**⡿⠟⠋⠁\
+	 *          &#8198;*/
+	static HALF_RAMP_1_DI: Shape;
+	/**&#8198;    ⠹⣿\
+	 *         ⠹*/
+	static HALF_RAMP_1_LI: Shape;
+	/**⢀⣠⣴⣾\
+	   ⣿⣿⣿⣿*/
+	static HALF_RAMP_2_UI: Shape;
+	/**⣿⣿⣆   \
+	   ⣿⣿⣿⣆*/
+	static HALF_RAMP_2_RI: Shape;
+	/**⣿⣿⣿⣿\
+	   ⡿⠟⠋⠁*/
+	static HALF_RAMP_2_DI: Shape;
+	/**⠹⣿⣿⣿\
+	 *     ⠹⣿⣿*/
+	static HALF_RAMP_2_LI: Shape;
+	/**⣷⣦⣄⡀\
+	 *          &#8198;*/
+	static HALF_RAMP_3_U: Shape;
+	/**&#8198;    ⣿⠏\
+	 *       ⠏  &#8198;*/
+	static HALF_RAMP_3_R: Shape;
+	/**&#8198;        \
+	   ⠈⠙⠻⢿*/
+	static HALF_RAMP_3_D: Shape;
+	/**&#8198;  ⣰     \
+	   ⣰⣿    &#8198;*/
+	static HALF_RAMP_3_L: Shape;
+	/**⢀⣠⣴⣾\
+	 *          &#8198;*/
+	static HALF_RAMP_3_UI: Shape;
+	/**&#8198;    ⣆   \
+	 *       ⣿⣆*/
+	static HALF_RAMP_3_RI: Shape;
+	/**&#8198;        \
+	   ⡿⠟⠋⠁*/
+	static HALF_RAMP_3_DI: Shape;
+	/**⠹⣿     \
+	 *     ⠹    &#8198;*/
+	static HALF_RAMP_3_LI: Shape;
+	/**&#8198;        \
+	   ⣿⣿    &#8198;*/
+	static QUARTER_UR: Shape;
+	/**⣿⣿     \
+	 *          &#8198;*/
+	static QUARTER_DR: Shape;
+	/**&#8198;    ⣿⣿\
+	 *          &#8198;*/
+	static QUARTER_DL: Shape;
+	/**&#8198;        \
+	 *       ⣿⣿*/
+	static QUARTER_UL: Shape;
+	/**&#8198;        \
+	   ⣷⣄    &#8198;*/
+	static QUARTER_RAMP_UR: Shape;
+	/**⡿⠋     \
+	 *          &#8198;*/
+	static QUARTER_RAMP_DR: Shape;
+	/**&#8198;    ⠙⢿\
+	 *          &#8198;*/
+	static QUARTER_RAMP_DL: Shape;
+	/**&#8198;        \
+	 *       ⣠⣾*/
+	static QUARTER_RAMP_UL: Shape;
+	/**⣿⣿⣷⣄\
+	   ⣿⣿⣿⣿*/
+	static BEVEL_UR: Shape;
+	/**⣿⣿⣿⣿\
+	   ⣿⣿⡿⠋*/
+	static BEVEL_DR: Shape;
+	/**⣿⣿⣿⣿\
+	   ⠈⠻⣿⣿*/
+	static BEVEL_DL: Shape;
+	/**⢀⣴⣿⣿\
+	   ⣿⣿⣿⣿*/
+	static BEVEL_UL: Shape;
+}
+export declare const PREFIX = "DSA:";
 /** The mode of a pusher config. */
-export declare enum PusherMode {
-	PUSH = 0,
-	PULL = 1,
-	DO_NOTHING = 2
+export declare class PusherMode extends Enum<number> {
+	static PUSH: PusherMode;
+	static PULL: PusherMode;
+	static DO_NOTHING: PusherMode;
 }
 /** The pickup or drop point of a loader config. */
-export declare enum LoaderPoint {
-	TOP_LEFT = 0,
-	TOP = 1,
-	TOP_RIGHT = 2,
-	LEFT = 3,
-	RIGHT = 4,
-	BOTTOM_LEFT = 5,
-	BOTTOM = 6,
-	BOTTOM_RIGHT = 7
+export declare class LoaderPoint extends Enum<number> {
+	static TOP_LEFT: LoaderPoint;
+	static TOP: LoaderPoint;
+	static TOP_RIGHT: LoaderPoint;
+	static LEFT: LoaderPoint;
+	static RIGHT: LoaderPoint;
+	static BOTTOM_LEFT: LoaderPoint;
+	static BOTTOM: LoaderPoint;
+	static BOTTOM_RIGHT: LoaderPoint;
 }
 /** The priority of a loader config. */
-export declare enum LoaderPriority {
-	LOW = 0,
-	NORMAL = 1,
-	HIGH = 2
+export declare class LoaderPriority extends Enum<number> {
+	static LOW: LoaderPriority;
+	static NORMAL: LoaderPriority;
+	static HIGH: LoaderPriority;
 }
 /** The mode of a filter config. */
-export declare enum FilterMode {
-	ALLOW_ALL = 0,
-	BLOCK_FILTER_ONLY = 1,
-	ALLOW_FILTER_ONLY = 2,
-	BLOCK_ALL = 3
+export declare class FilterMode extends Enum<number> {
+	static ALLOW_ALL: FilterMode;
+	static BLOCK_FILTER_ONLY: FilterMode;
+	static ALLOW_FILTER_ONLY: FilterMode;
+	static BLOCK_ALL: FilterMode;
 }
-export declare enum FixedAngle {
-	RIGHT = 0,
-	UP = 1,
-	LEFT = 2,
-	DOWN = 3
+export declare class FixedAngle extends Enum<number> {
+	static RIGHT: FixedAngle;
+	static UP: FixedAngle;
+	static LEFT: FixedAngle;
+	static DOWN: FixedAngle;
 }
 export interface DecoderOptions {
 	/**
@@ -144,7 +670,7 @@ export interface BlueprintOptions {
 	 * @example
 	 * for (const cmd of bp.commands) {
 	 * 	if (cmd instanceof BuildCmd) {
-	 * 		console.log(cmd.item)
+	 * 		console.log(cmd.item.name)
 	 * 	}
 	 * }
 	 * @defaultValue `[]`
@@ -163,12 +689,12 @@ export interface BuildCmdOptions {
 	 * Y-coord, vertical offset from the **middle** of left bottom square of the blueprint area. Can go down to `-0.5`.
 	 */
 	y?: number;
-	/** Integer ID of the item to build. */
-	item?: number;
+	/** The item to build. See the {@link Item} enum. */
+	item?: Item;
 	/** A {@link BuildBits} instance. */
 	bits?: BuildBits;
-	/** Shape index of the tile to be placed. */
-	shape?: number;
+	/** Shape of the block to be placed. */
+	shape?: Shape;
 }
 /**
  * All the properties can be set. Set to `undefined` to remove a property, `null` to use {@link ConfigCmd.defaults} during encoding.
@@ -181,11 +707,11 @@ export interface BuildCmdOptions {
 export interface ConfigCmdOptions {
 	/** What the filter for hatches and loaders should do. */
 	filterMode?: FilterMode;
-	/** Array of 3 item IDs in integer. */
+	/**  */
 	filterItems?: [
-		number,
-		number,
-		number
+		Item,
+		Item,
+		Item
 	];
 	/** Used for expando boxes. [0, 360] float. */
 	angle?: number;
@@ -233,10 +759,10 @@ export interface PusherConfig {
 	maxBeamLength?: number;
 }
 export declare class Blueprint implements BlueprintOptions {
-	/** @inheritDoc */ version: BlueprintOptions["version"];
-	/** @inheritDoc */ width: BlueprintOptions["width"];
-	/** @inheritDoc */ height: BlueprintOptions["height"];
-	/** @inheritDoc */ commands: BlueprintOptions["commands"];
+	version: BlueprintOptions["version"];
+	width: BlueprintOptions["width"];
+	height: BlueprintOptions["height"];
+	commands: BlueprintOptions["commands"];
 	/**
 	 * @param input Defaults to a 1x1 blueprint with no commands and version 0.
 	 */
@@ -263,12 +789,12 @@ export declare class ConfigCmd extends BPCmd implements ConfigCmdOptions {
 	static get defaults(): Required<ConfigCmdOptions>;
 	static set defaults(input: Required<ConfigCmdOptions>);
 	/** @private */ rawData: Uint8Array;
-	/** @inheritDoc */ filterMode: ConfigCmdOptions["filterMode"];
-	/** @inheritDoc */ filterItems: ConfigCmdOptions["filterItems"];
-	/** @inheritDoc */ angle: ConfigCmdOptions["angle"];
-	/** @inheritDoc */ fixedAngle: ConfigCmdOptions["fixedAngle"];
-	/** @inheritDoc */ pusher: ConfigCmdOptions["pusher"];
-	/** @inheritDoc */ loader: ConfigCmdOptions["loader"];
+	filterMode: ConfigCmdOptions["filterMode"];
+	filterItems: ConfigCmdOptions["filterItems"];
+	angle: ConfigCmdOptions["angle"];
+	fixedAngle: ConfigCmdOptions["fixedAngle"];
+	pusher: ConfigCmdOptions["pusher"];
+	loader: ConfigCmdOptions["loader"];
 	/**
 	 * @param input If omitted, the config will be empty.
 	 * The game won't modify the existing config of an already placed object if the config command is empty.
@@ -285,8 +811,6 @@ export declare class ConfigCmd extends BPCmd implements ConfigCmdOptions {
 	/**
 	 * Checks whether the data of this command is not decoded. Comes from decoding a blueprint with
 	 * {@link DecoderOptions.ignoreConfigCmdData} = `true`.
-	 *
-	 * @see {@link DecoderOptions.ignoreConfigCmdData} for more info.
 	 */
 	get isRaw(): boolean;
 	/**
@@ -305,9 +829,9 @@ export declare class Decoder {
 	#private;
 	options: DecoderOptions;
 	constructor();
-	/** @inheritDoc decodeSync */
+	/** {@inheritDoc decodeSync} */
 	decodeSync(input: string, options?: DecoderOptions): Blueprint;
-	/** @inheritDoc decodeConfigCmdSync */
+	/** {@inheritDoc decodeConfigCmdSync} */
 	decodeConfigCmdSync(cmd: ConfigCmd): ConfigCmd;
 	/** @private */
 	decodeConfigCmdData(rawCmd: Uint8Array): any;
@@ -321,15 +845,15 @@ export declare class Decoder {
 export declare class Encoder {
 	#private;
 	constructor();
-	/** @inheritDoc encode */
+	/** {@inheritDoc encode} */
 	encodeSync(bp: Blueprint): string;
 }
 export declare class BuildCmd extends BPCmd implements BuildCmdOptions {
-	/** @inheritDoc */ x: BuildCmdOptions["x"];
-	/** @inheritDoc */ y: BuildCmdOptions["y"];
-	/** @inheritDoc */ item: BuildCmdOptions["item"];
-	/** @inheritDoc */ bits: BuildCmdOptions["bits"];
-	/** @inheritDoc */ shape: BuildCmdOptions["shape"];
+	x: BuildCmdOptions["x"];
+	y: BuildCmdOptions["y"];
+	item: BuildCmdOptions["item"];
+	bits: BuildCmdOptions["bits"];
+	shape: BuildCmdOptions["shape"];
 	constructor(input?: BuildCmdOptions);
 	/** Changes multiple properties of the command. */
 	set(input: BuildCmdOptions): this;
@@ -339,7 +863,6 @@ export declare class BuildCmd extends BPCmd implements BuildCmdOptions {
 	toArray(): any[];
 	clone(): BuildCmd;
 }
-export declare const PREFIX = "DSA:";
 /**
  * Synchronously decodes a blueprint string.
  * Supports the "DSA:" prefix (case-insensitive).
@@ -364,13 +887,13 @@ export declare function decodeSync(input: string, options?: DecoderOptions): Blu
 export declare function decode(input: string, options?: DecoderOptions): Promise<Blueprint>;
 /**
  * Synchronously decodes the data of a {@link ConfigCmd} containing raw data.
- * @see {@link DecoderOptions.ignoreConfigCmdData} for more info.
+ * See {@link DecoderOptions.ignoreConfigCmdData} for more info.
  * @returns The same input instance, with decoded data.
  */
 export declare function decodeConfigCmdSync(cmd: ConfigCmd): ConfigCmd;
 /**
  * Asynchronously decodes the data of a {@link ConfigCmd} containing raw data.
- * @see {@link DecoderOptions.ignoreConfigCmdData} for more info.
+ * See {@link DecoderOptions.ignoreConfigCmdData} for more info.
  * @returns The same input instance, with decoded data.
  */
 export declare function decodeConfigCmd(cmd: ConfigCmd): Promise<ConfigCmd>;

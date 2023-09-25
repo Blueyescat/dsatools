@@ -1,4 +1,4 @@
-/*! dsabp-js v0.1.0 @license GPL-3.0 https://github.com/Blueyescat/dsabp-js */
+/*! dsabp-js v0.3.1 @license MIT https://github.com/Blueyescat/dsabp-js */
 
 // src/BPCmd.ts
 var BPCmd = class {
@@ -91,8 +91,262 @@ function reverse(str) {
   return str.split("").reduce((r, c) => c + r);
 }
 
-// src/constants.ts
-var PREFIX = "DSA:";
+// src/constants/Enum.ts
+var Enum = class _Enum {
+  static maps = /* @__PURE__ */ new Map();
+  static getMap() {
+    return this.maps.get(this.name)[0];
+  }
+  static getReverseMap() {
+    return this.maps.get(this.name)[1];
+  }
+  static getByName(name) {
+    return this.getMap().get(name);
+  }
+  static getByValue(value) {
+    return this.getMap().get(
+      this.getReverseMap().get(value)
+    );
+  }
+  static end() {
+    this.maps.set(this.name, [/* @__PURE__ */ new Map(), /* @__PURE__ */ new Map()]);
+    const map = this.getMap();
+    const reverseMap = this.getReverseMap();
+    for (const key in this) {
+      const value = this[key];
+      if (value instanceof _Enum) {
+        value.enumName = key;
+        map.set(key, value);
+        reverseMap.set(value.enumValue, key);
+      }
+    }
+  }
+  constructor(value) {
+    this.enumValue = value;
+  }
+  enumName;
+  enumValue;
+  toString() {
+    return this.constructor.name + "." + this.enumName;
+  }
+};
+
+// src/constants/ItemEnum.ts
+var Item = class _Item extends Enum {
+  name;
+  description;
+  stackable;
+  rarity;
+  constructor(id, name, description, stackable, rarity, image, buildInfo, blacklist_autobuild, fab_type) {
+    super(id);
+    this.name = name;
+    this.description = description;
+    this.stackable = stackable;
+    this.rarity = rarity;
+    if (image !== void 0)
+      this.image = image;
+    if (buildInfo !== void 0)
+      this.buildInfo = buildInfo;
+    if (blacklist_autobuild !== void 0)
+      this.blacklist_autobuild = blacklist_autobuild;
+    if (fab_type !== void 0)
+      this.fab_type = fab_type;
+  }
+  get id() {
+    return this.enumValue;
+  }
+  get isBuildable() {
+    return !!this.buildInfo;
+  }
+  get isBlock() {
+    return !!this.buildInfo?.[0]?.block;
+  }
+  static getById(id) {
+    return _Item.getByValue(id);
+  }
+  static NULL = new this(0, "", "", false, NaN);
+  static RES_METAL = new this(1, "Iron", "Material. Used to produce most items.", true, 0, "item/res_iron");
+  static RES_GUNPOWDER = new this(2, "Explosives", "Material. Used to produce munitions.", true, 0, "item/res_explosives");
+  static RES_HYPER_RUBBER = new this(4, "Hyper Rubber", "Material. High Elasticity.", true, 2, "item/res_hyper_rubber");
+  static RES_FLUX = new this(5, "Flux Crystals", "Material. Used to produce advanced machinery.", true, 2, "item/res_flux_crystals");
+  static RES_FUEL = new this(6, "Thruster Fuel", "Refined fuel. Powers thrusters. More efficient than explosives.", true, 0, "item/fuel");
+  static SCRAP_METAL = new this(50, "Scrap Metal", "Can be processed by a recycler.", true, 0, "item/scrap");
+  static BALL_VOLLEY = new this(51, "Volleyball", "\u{1F3D0}", false, 2, "item/ball_volley");
+  static BALL_VOLLEY_GOLD = new this(52, "Golden Volleyball", "\u{1F31F}\u{1F3D0}\u{1F31F}", false, 2, "item/ball_vg");
+  static BALL_BASKET = new this(53, "Basketball", "\u{1F3C0}", false, 2, "item/ball_basket");
+  static BALL_BASKET_GOLD = new this(54, "Golden Basketball", "\u{1F31F}\u{1F3C0}\u{1F31F}", false, 2, "item/ball_bg");
+  static BALL_BEACH = new this(55, "Beach Ball", "\u{1F334}", false, 2, "item/ball_beach");
+  static BALL_SOCCER = new this(56, "Football", "\u26BD", false, 2, "item/ball_soccer");
+  static WRENCH = new this(100, "Wrench", "Used to take stuff apart.", false, 0, "item/wrench");
+  static SHREDDER = new this(101, "Item Shredder", "Destroys items.", false, 0, "item/item_shredder");
+  static SHREDDER_GOLD = new this(102, "Golden Item Shredder", "Destroys items quickly, with style.", false, 9, "item/item_shredder_g");
+  static REPAIR_TOOL = new this(103, "Repair Tool", "Used to repair blocks and objects.", false, 0, "item/repair_tool");
+  static HAND_PUSHER = new this(104, "Handheld Pusher", "A pusher you can hold in your hand.", false, 2, "item/pusher_hand");
+  static SHIELD_BOOSTER = new this(105, "Ship Shield Booster", "An inferior power source for shield generators.", false, 0, "item/repairkit");
+  static SHIP_EMBIGGENER = new this(106, "Ship Embiggener", "Makes your ship bigger. Press R to change axis.", false, 0, "item/ship_embiggener");
+  static SHIP_SHRINKINATOR = new this(107, "Ship Shrinkinator", "Makes your ship smaller. Space must be completely empty. Press R to change axis.", false, 0, "item/ship_shrinkinator");
+  static EQUIPMENT_BACKPACK = new this(108, "Backpack", "Equipment (Back). Lets you hold more items.", false, 1, "item/eq_backpack");
+  static EQUIPMENT_SPEED_SKATES = new this(109, "Speed Skates", "Equipment (Feet). SPEED.", false, 2, "item/eq_speed_skates");
+  static EQUIPMENT_BOOSTER_BOOTS = new this(110, "Booster Boots", "Equipment (Feet). Provides a double-jump and slightly more powerful jumps.", false, 2, "item/eq_booster_boots");
+  static EQUIPMENT_LAUNCHER_GAUNTLETS = new this(111, "Launcher Gauntlets", "Equipment (Hands). Throw items more powerfully.", false, 2, "item/eq_launcher_gauntlets");
+  static EQUIPMENT_CONSTRUCTION_GAUNTLETS = new this(112, "Construction Gauntlets", "Equipment (Hands). While in a safe zone: Doubles build/destruct/repair/use range and speed, and allows using objects through walls.", false, 2, "item/eq_construction_gauntlets");
+  static EQUIPMENT_ROCKET_PACK = new this(113, "Rocket Pack", "Equipment (Back). Speedy Flight.", false, 2, "item/eq_rocket_pack");
+  static EQUIPMENT_HOVER_PACK = new this(114, "Hover Pack", "Equipment (Back). Controlled Flight.", false, 2, "item/eq_hover_pack");
+  static SCANNER_MANIFEST = new this(115, "Manifest Scanner", "Generate a list of items on your ship.", false, 2, "item/scanner_manifest");
+  static SCANNER_BOM = new this(116, "BoM Scanner", "Generate a list of materials used to build your ship.", false, 2, "item/scanner_bom");
+  static WRENCH_STARTER = new this(117, "Starter Wrench", "Useful for getting you out of a bind. Slow. Disappears if dropped.", false, -1, "item/wrench_starter");
+  static SHREDDER_STARTER = new this(118, "Starter Shredder", "Destroys items. Slow. Disappears if dropped.", false, -1, "item/item_shredder_starter");
+  static HAND_CANNON = new this(119, "Hand Cannon", "[TEST EXCLUSIVE] A small, handheld cannon. Uses ammo in your inventory.", false, 0, "item/hand_cannon");
+  static SCANNER_BLUEPRINT = new this(120, "Blueprint Scanner", "Generates blueprint strings, which describe how to rebuild ships or parts of ships. Click and drag to select a region.", false, 2, "item/scanner_blueprint");
+  static RCD_SANDBOX = new this(121, "Sandbox RCD", "Buildable. Used for automated construction. This test-exclusive variant can spawn items and doesn't need fuel. It works faster on ships owned by patrons.", false, -1, "item/rcd_sandbox", [{ bounds: { x: 2.5, y: 2.5 }, shape: { verts: [{ x: -1.25, y: -0.5 }, { x: -0.5, y: -1.25 }, { x: 0.5, y: -1.25 }, { x: 1.25, y: -0.5 }, { x: 1.25, y: 0.5 }, { x: 0.5, y: 1.25 }, { x: -0.5, y: 1.25 }, { x: -1.25, y: 0.5 }] }, allow_non_solids: true, image: "rcd_sandbox", image_only: true }], true);
+  static RCD_FLUX = new this(122, "Flux RCD", "Buildable. Used for automated construction. Consumes flux as fuel.", false, 2, "item/rcd_flux", [{ bounds: { x: 2.5, y: 2.5 }, shape: { verts: [{ x: -1.25, y: -0.5 }, { x: -0.5, y: -1.25 }, { x: 0.5, y: -1.25 }, { x: 1.25, y: -0.5 }, { x: 1.25, y: 0.5 }, { x: 0.5, y: 1.25 }, { x: -0.5, y: 1.25 }, { x: -1.25, y: 0.5 }] }, allow_non_solids: true, image: "rcd_flux", image_only: true }], true);
+  static SHIELD_CORE = new this(123, "Shield Core", "A power source for shield generators.", false, 1, "item/shield_core");
+  static AMMO_STANDARD = new this(150, "Standard Ammo", "Fast reloads.", true, 0, "item/ammo_standard");
+  static AMMO_SCATTER = new this(151, "ScatterShot Ammo", "Shoots multiple projectiles. Good for damaging critical ships.", true, 0, "item/ammo_scattershot");
+  static AMMO_FLAK = new this(152, "Flak Ammo", "Explodes into more bullets in flight.", true, 0, "item/ammo_flak");
+  static AMMO_SNIPER = new this(153, "Sniper Ammo", "Flies swift & true. Bouncy.", true, 0, "item/ammo_sniper");
+  static AMMO_PUNCH = new this(154, "Punch Ammo", "Pushes objects away.", true, 0, "item/ammo_punch");
+  static AMMO_YANK = new this(155, "Yank Ammo", "Pulls objects.", true, 0, "item/ammo_yank");
+  static AMMO_SLUG = new this(156, "Slug Ammo", "Huge damage. Very slow.", true, 0, "item/ammo_slug");
+  static AMMO_TRASH = new this(157, "Trash Ammo", "Low quality, but free! Decays over time.", true, 0, "item/ammo_trash");
+  static FUEL_BOOSTER_LOW = new this(159, "Booster Fuel (Low Grade)", "Increases thruster power for a short time.", false, 0, "item/booster_low");
+  static FUEL_BOOSTER_HIGH = new this(160, "Booster Fuel (High Grade)", "Increases thruster power for a short time.", false, 2, "item/booster_high");
+  static VOID_ORB = new this(161, "Void Orb", "DO NOT EAT!", false, 10, "item/void_orb");
+  static TURRET_BOOSTER_RAPID = new this(162, "Turret Booster - Rapid Fire", "Boosts a re-configurable turret's fire rate by 50%, with reduced accuracy.", false, 2, "item/turret_booster_rapid");
+  static TURRET_BOOSTER_RAPID_USED = new this(163, "Turret Booster - Rapid Fire (Depleted)", "Boosts a re-configurable turret's fire rate by 25%, with reduced accuracy. Nearly depleted!", false, 2, "item/turret_booster_rapid_used");
+  static TURRET_BOOSTER_PRESERVATION = new this(164, "Turret Booster - Preservation", "Boosts a re-configurable turret's ammo preservation by 10%, with reduced rotational aiming limits.", false, 2, "item/turret_booster_preservation");
+  static TURRET_BOOSTER_PRESERVATION_USED = new this(165, "Turret Booster - Preservation (Depleted)", "Boosts a re-configurable turret's ammo preservation by 5%, with reduced rotational aiming limits. Nearly depleted!", false, 2, "item/turret_booster_preservation_used");
+  static HELM = new this(215, "Helm (Packaged)", "Buildable. Used to pilot your ship.", false, 0, "item/helm", [{ snap_y: true, offset: { x: 0, y: 0.3 }, bounds: { x: 1.5, y: 1.5 }, require_blocks: [{ x: 0, y: -1, block: "_BUILD_SURFACE" }], allow_solids: true, image: "helm_wheel", image_only: true }]);
+  static HELM_STARTER = new this(216, "Helm (Starter, Packaged)", "Buildable Starter Item. Used to pilot your ship.", false, -1, "item/helm_starter", [{ snap_y: true, offset: { x: 0, y: 0.3 }, bounds: { x: 1.5, y: 1.5 }, require_blocks: [{ x: 0, y: -1, block: "_BUILD_SURFACE" }], allow_solids: true, image: "helm_wheel_starter", image_only: true }]);
+  static COMMS_STATION = new this(217, "Comms Station (Packaged)", "Buildable. Used to communicate with other ships.", false, 0, "item/comms", [{ snap_y: true, offset: { x: 0, y: -0.25 }, bounds: { x: 1.25, y: 2.5 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "comms_station", image_only: true }]);
+  static SIGN = new this(218, "Sign (Packaged)", "Buildable. Can display a short message.", false, 0, "item/sign", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, allow_solids: true, image: "sign" }], true);
+  static SPAWN_POINT = new this(219, "Spawn Point (Packaged)", "Buildable. Can be set to spawn a specific rank.", false, 0, "item/spawn", [{ snap_y: true, offset: { x: 0, y: 0.5 }, bounds: { x: 1, y: 2 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "spawn" }], true);
+  static DOOR = new this(220, "Door (Packaged)", "Buildable. Can be restricted to specific ranks. Press R to rotate.", false, 0, "item/door", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, offset: { x: 0.5, y: 0 }, bounds: { x: 2, y: 0.45 }, image: "door_full" }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, offset: { x: 0, y: 0.5 }, bounds: { x: 0.45, y: 2 }, image: "door_full" }], true);
+  static ITEM_HATCH = new this(221, "Cargo Hatch (Packaged)", "Buildable. Drops items picked up by the ship.", false, 0, "item/item_hatch", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, allow_solids: true }]);
+  static ITEM_HATCH_STARTER = new this(222, "Cargo Hatch (Starter, Packaged)", "Buildable Starter Item. Drops items picked up by the ship.", false, -1, "item/item_hatch_starter", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, allow_solids: true }]);
+  static ITEM_EJECTOR = new this(223, "Cargo Ejector (Packaged)", "Buildable. Can be used to eject items from the ship.", false, 0, "item/item_ejector", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, bounds: { x: 2.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_H" }, { x: 1, y: 0, block: "HULL_H" }, { x: -1, y: 0, block: "HULL_H" }], allow_world: true }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, bounds: { x: 0.8, y: 2.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_V" }, { x: 0, y: 1, block: "HULL_V" }, { x: 0, y: -1, block: "HULL_V" }], allow_world: true }]);
+  static TURRET_CONTROLLER = new this(224, "Turret Controller (Packaged)", "Buildable. Controls adjacent turrets.", false, 0, "item/turret_controller", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, bounds: { x: 2.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_H" }, { x: 1, y: 0, block: "HULL_H" }, { x: -1, y: 0, block: "HULL_H" }], allow_world: true }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, bounds: { x: 0.8, y: 2.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_V" }, { x: 0, y: 1, block: "HULL_V" }, { x: 0, y: -1, block: "HULL_V" }], allow_world: true }]);
+  static TURRET_REMOTE = new this(226, "RC Turret (Packaged)", "Buildable. Controlled remotely from the helm.", false, 1, "item/turret_rc", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, bounds: { x: 2.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_H" }, { x: 1, y: 0, block: "HULL_H" }, { x: -1, y: 0, block: "HULL_H" }], allow_world: true }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, bounds: { x: 0.8, y: 2.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_V" }, { x: 0, y: 1, block: "HULL_V" }, { x: 0, y: -1, block: "HULL_V" }], allow_world: true }]);
+  static TURRET_REMOTE_STARTER = new this(227, "RC Turret (Starter, Packaged)", "Buildable Starter Item. Controlled remotely from the helm.", false, -1, "item/turret_rc_starter", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, bounds: { x: 2.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_H" }, { x: 1, y: 0, block: "HULL_H" }, { x: -1, y: 0, block: "HULL_H" }], allow_world: true }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, bounds: { x: 0.8, y: 2.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_V" }, { x: 0, y: 1, block: "HULL_V" }, { x: 0, y: -1, block: "HULL_V" }], allow_world: true }]);
+  static TURRET_BURST = new this(228, "Burst Turret (Packaged)", "Buildable. Fires a burst of shots.", false, 1, "item/turret_burst", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, bounds: { x: 2.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_H" }, { x: 1, y: 0, block: "HULL_H" }, { x: -1, y: 0, block: "HULL_H" }], allow_world: true }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, bounds: { x: 0.8, y: 2.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_V" }, { x: 0, y: 1, block: "HULL_V" }, { x: 0, y: -1, block: "HULL_V" }], allow_world: true }]);
+  static TURRET_AUTO = new this(229, "Auto Turret (Packaged)", "Buildable. Fully automatic gun.", false, 1, "item/turret_auto", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, bounds: { x: 2.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_H" }, { x: 1, y: 0, block: "HULL_H" }, { x: -1, y: 0, block: "HULL_H" }], allow_world: true }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, bounds: { x: 0.8, y: 2.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_V" }, { x: 0, y: 1, block: "HULL_V" }, { x: 0, y: -1, block: "HULL_V" }], allow_world: true }]);
+  static THRUSTER = new this(230, "Thruster (Packaged)", "Buildable. Moves your ship. Fuelled with explosives.", false, 0, "item/thruster", [{ buildDirection: "HORIZONTAL", snap_x: true, snap_y: true, bounds: { x: 2.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_H" }, { x: 1, y: 0, block: "HULL_H" }, { x: -1, y: 0, block: "HULL_H" }], allow_world: true }, { buildDirection: "VERTICAL", snap_x: true, snap_y: true, bounds: { x: 0.8, y: 2.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_V" }, { x: 0, y: 1, block: "HULL_V" }, { x: 0, y: -1, block: "HULL_V" }], allow_world: true }]);
+  static THRUSTER_STARTER = new this(231, "Thruster (Starter, Packaged)", "Buildable Starter Item. Moves your ship. Doesn't need fuel.", false, -1, "item/thruster_starter", [{ snap_x: true, snap_y: true, bounds: { x: 0.8, y: 0.8 }, require_blocks: [{ x: 0, y: 0, block: "HULL_CORNER" }], allow_world: true }]);
+  static BLOCK = new this(232, "Iron Block", "Buildable. Used for interior walls/floors.", true, 0, "item/block", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block: 4, block_shaped: true }]);
+  static BLOCK_HYPER_RUBBER = new this(233, "Hyper Rubber Block", "Buildable. Bouncy.", true, 2, "item/block_hrubber", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block: 13, block_shaped: true }]);
+  static BLOCK_ICE_GLASS = new this(234, "Hyper Ice Block", "Buildable. Low-friction ice that can't melt for some reason.", true, 0, "item/block_sglass", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block: 14, block_shaped: true }]);
+  static BLOCK_LADDER = new this(235, "Ladder", "Buildable. You can climb them.", true, 0, "item/ladder", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block: 5 }]);
+  static BLOCK_WALKWAY = new this(236, "Walkway", "Buildable. Blocks players but not items.", true, 0, "item/walkway", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block: 6, block_shaped: true }]);
+  static BLOCK_ITEM_NET = new this(237, "Item Net", "Buildable. Blocks items but not players.", true, 0, "item/item_net", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block: 7, block_shaped: true }]);
+  static PAINT = new this(239, "Paint", "Used to paint your ship's background. Hold R to select color.", true, 0, "item/color_panel", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block_is_colored: true, allow_world: true, allow_any: true }], true);
+  static EXPANDO_BOX = new this(240, "Expando Box (Packaged)", "Buildable. Flexible bulk storage.", false, 0, "item/exbox", [{ bounds: { x: 2, y: 2 }, shape: { verts: [{ x: -0.95, y: -0.75 }, { x: -0.75, y: -0.95 }, { x: 0.75, y: -0.95 }, { x: 0.95, y: -0.75 }, { x: 0.95, y: 0.75 }, { x: 0.75, y: 0.95 }, { x: -0.75, y: 0.95 }, { x: -0.95, y: 0.75 }] }, allow_non_solids: true, build_angle: "Any", image: "exbox_base", image_only: true }]);
+  static FREEPORT_ANCHOR = new this(241, "Safety Anchor", "Buildable. Prevents teleports out of safe zones while placed.", false, 0, "item/anchor", [{ bounds: { x: 3, y: 3 }, snap_x: true, snap_y: true, image: "anchor" }]);
+  static PUSHER = new this(242, "Pusher (Packaged)", "Buildable. Pushes things.", false, 2, "item/pusher", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, image: "loader_base", image_only: true }]);
+  static ITEM_LAUNCHER = new this(243, "Item Launcher (Packaged)", "Buildable. Launches items at a configurable speed and angle.", false, 2, "item/item_launcher", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, image: "item_launcher", image_only: true }], true);
+  static LOADER = new this(244, "DEPRECATED ITEM", "DEPRECATED ITEM", false, 2, "item/loader_old");
+  static RECYCLER = new this(245, "Recycler (Packaged)", "Buildable. Converts items back into resources.", false, 0, "item/recycler", [{ snap_y: true, offset: { x: 0, y: 0.25 }, bounds: { x: 2.25, y: 3.5 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "recycler", image_only: true }]);
+  static FABRICATOR_GOLD = new this(246, "Fabricator (Legacy, Packaged)", "Buildable. It doesn't do anything.", false, 9, "item/fabricator_legacy", [{ snap_y: true, bounds: { x: 2.5, y: 3 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "fab_lod", image_only: true }], void 0, "Legacy");
+  static FABRICATOR_STARTER = new this(247, "Fabricator (Starter, Packaged)", "Buildable Starter Item. Used to craft basic items.", false, -1, "item/fabricator_starter", [{ snap_y: true, bounds: { x: 2.5, y: 3 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "fab_lod", image_only: true }], void 0, "Starter");
+  static FABRICATOR_MUNITIONS = new this(248, "Fabricator (Munitions, Packaged)", "Buildable. Used to craft ammo and other consumables.", false, 0, "item/fabricator_munitions", [{ snap_y: true, bounds: { x: 2.5, y: 3 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "fab_lod", image_only: true }], void 0, "Munitions");
+  static FABRICATOR_ENGINEERING = new this(249, "Fabricator (Engineering, Packaged)", "Buildable. Used to craft tools, blocks, and security items.", false, 0, "item/fabricator_engineering", [{ snap_y: true, bounds: { x: 2.5, y: 3 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "fab_lod", image_only: true }], void 0, "Engineering");
+  static FABRICATOR_MACHINE = new this(250, "Fabricator (Machine, Packaged)", "Buildable. Used to craft machines such as fabricators, helms, and turrets.", false, 0, "item/fabricator_machine", [{ snap_y: true, bounds: { x: 2.5, y: 3 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "fab_lod", image_only: true }], void 0, "Machine");
+  static FABRICATOR_EQUIPMENT = new this(251, "Fabricator (Equipment, Packaged)", "Buildable. Used to craft wearable equipment.", false, 0, "item/fabricator_equipment", [{ snap_y: true, bounds: { x: 2.5, y: 3 }, require_blocks: [{ x: 0, y: -2, block: "_BUILD_SURFACE" }], allow_solids: true, image: "fab_lod", image_only: true }], void 0, "Equipment");
+  static LOADER_NEW = new this(252, "Loader (Packaged)", "Buildable. Loads items into machines.", false, 2, "item/loader", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, image: "loader_base", image_only: true }]);
+  static LOCKDOWN_OVERRIDE_GREEN = new this(253, "Lockdown Override Unit", "Buildable. Allows a limited number of green rarity items to be removed from a ship while in lockdown mode.", false, 2, "item/lockdown_override_green", [{ bounds: { x: 1, y: 1 }, snap_x: true, snap_y: true, image: "lockdown_override_green", is_lockdown_override: true }], true);
+  static BLOCK_ANNIHILATOR = new this(254, "Annihilator Tile", "[TEST EXCLUSIVE] Buildable. Destroys objects.", true, 0, "item/annihilator_tile", [{ snap_x: true, snap_y: true, bounds: { x: 1, y: 1 }, block: 15 }]);
+  static FLUID_TANK = new this(255, "Fluid Tank", "Buildable. Stores fluids.", false, 0, "item/tank", [{ bounds: { x: 2, y: 2 }, snap_x: true, snap_y: true, offset: { x: 0.5, y: 0.5 }, offset2: { x: -0.5, y: -0.5 }, image: "tank" }]);
+  static SHIELD_GENERATOR = new this(256, "Shield Generator", "Buildable. Generates shield fluid.", false, 2, "item/shield_generator", [{ bounds: { x: 4, y: 2 }, snap_x: true, snap_y: true, offset: { x: 0.5, y: 0.5 }, offset2: { x: -0.5, y: -0.5 }, image: "shield_generator", build_angle: "Fixed", image_only: true }]);
+  static SHIELD_PROJECTOR = new this(257, "Shield Projector", "Buildable. Used to activate an adjacent bank of shield tanks.", false, 2, "item/shield_projector", [{ bounds: { x: 1, y: 1 }, snap_x: true, snap_y: true, image: "shield_projector_1" }]);
+  static TURRET_CONTROLLER_NEW = new this(258, "Enhanced Turret Controller", "Buildable. Used to control turrets remotely.", false, 2, "item/turret_controller_new", [{ bounds: { x: 1, y: 1 }, snap_x: true, snap_y: true }]);
+  static BULK_EJECTOR = new this(259, "Bulk Ejector (Packaged)", "Buildable. WIP / UNOBTAINABLE", false, 2, "item/bulk_ejector", [{ bounds: { x: 2, y: 2 }, snap_x: true, snap_y: true, offset: { x: 0.5, y: 0.5 }, offset2: { x: -0.5, y: -0.5 }, build_angle: "Fixed" }]);
+  static BULK_BAY_MARKER = new this(260, "Bulk Loading Bay Designator (Packaged)", "Buildable. WIP / UNOBTAINABLE", false, 2, "item/bulk_bay_marker", [{ bounds: { x: 1, y: 1 }, snap_x: true, snap_y: true }]);
+  static NAV_UNIT = new this(261, "Navigation Unit (Starter, Packaged)", "Buildable Starter Item. Used to select a destination zone. Also functions as a simple shield projector.", false, -1, "item/nav_unit", [{ bounds: { x: 1, y: 1 }, snap_x: true, snap_y: true }]);
+  static ETERNAL_WRENCH_BRONZE = new this(300, "Eternal Bronze Wrench", "Patron reward. Will not despawn. Thank you for your support! \u{1F600}", false, -1, "item/wrench_bronze_et");
+  static ETERNAL_WRENCH_SILVER = new this(301, "Eternal Silver Wrench", "Patron reward. Will not despawn. Thank you for your support! \u{1F600}", false, -1, "item/wrench_silver_et");
+  static ETERNAL_WRENCH_GOLD = new this(302, "Eternal Gold Wrench", "Patron reward. Will not despawn. Thank you for your support! \u{1F600}", false, -1, "item/wrench_gold_et");
+  static ETERNAL_WRENCH_FLUX = new this(303, "Eternal Flux Wrench", "Patron reward. Will not despawn. Thank you for your support! \u{1F600}", false, -1, "item/wrench_flux_et");
+  static ETERNAL_WRENCH_PLATINUM = new this(304, "Eternal Platinum Wrench", "Patron reward. Will not despawn. Thank you for your support! \u{1F600}", false, -1, "item/wrench_platinum_et");
+  static TROPHY_NULL = new this(305, "Gold Null Trophy", "RIP 0x items.", false, 9, "item/trophy_null");
+  static TROPHY_BUG_HUNTER = new this(306, "Bug Hunter Trophy", "Rewarded for reporting a serious problem.", false, -1, "item/trophy_bug");
+  static TROPHY_NULL_SILVER = new this(307, "Silver Null Trophy", "RIP 0x items.", false, 9, "item/trophy_null_silver");
+  static PAT_WRENCH_BRONZE = new this(308, "Bronze Wrench", "Patron reward. Thank you for your support! \u{1F600}", false, 0, "item/wrench_bronze");
+  static PAT_WRENCH_SILVER = new this(309, "Silver Wrench", "Patron reward. Thank you for your support! \u{1F600}", false, 0, "item/wrench_silver");
+  static PAT_WRENCH_GOLD = new this(310, "Gold Wrench", "Patron reward. Thank you for your support! \u{1F600}", false, 0, "item/wrench_gold");
+  static PAT_WRENCH_PLATINUM = new this(311, "Platinum Wrench", "Patron reward. Thank you for your support! \u{1F600}", false, 0, "item/wrench_platinum");
+  static PAT_WRENCH_FLUX = new this(312, "Flux Wrench", "Patron reward. Thank you for your support! \u{1F600}", false, 0, "item/wrench_flux");
+  static COS_LESSER_CAP = new this(313, "Lesser Cap", "Cosmetic Equipment (Head). Patron reward.", false, 0, "item/cap");
+  static COS_GOOFY_GLASSES = new this(314, "Goofy Glasses", "Cosmetic Equipment (Face). Patron reward.", false, 0, "item/glasses");
+  static COS_SHADES = new this(315, "Shades", "Cosmetic Equipment (Face). Patron reward.", false, 0, "item/shades");
+  static COS_TOP_HAT = new this(316, "Top Hat", "Cosmetic Equipment (Head). Patron reward.", false, 0, "item/top_hat");
+  static COS_HORNS = new this(317, "Demon Horns", "Cosmetic Equipment (Head). Patron reward.", false, 0, "item/horns");
+  static COS_MASK_ALIEN = new this(318, "Alien Mask", "Cosmetic Equipment (Face). Patron reward.", false, 0, "item/mask_alien");
+  static COS_MASK_CLOWN = new this(319, "Clown Mask", "Cosmetic Equipment (Face). Patron reward.", false, 0, "item/mask_clown");
+  static COS_MASK_GOBLIN = new this(320, "Goblin Mask", "Cosmetic Equipment (Face). Patron reward.", false, 0, "item/mask_goblin");
+  static COS_PUMPKIN = new this(321, "Pumpkin", "Cosmetic Equipment (Face). Patron reward.", false, 0, "item/mask_pumpkin");
+  static COS_WITCH_HAT = new this(322, "Witch Hat", "Cosmetic Equipment (Head). Patron reward.", false, 0, "item/witch_hat");
+  static GREMLIN_RED = new this(323, "Wild Gremlin (Red)", "It looks upset.", false, 0, "item/gremlin_red");
+  static GREMLIN_ORANGE = new this(324, "Wild Gremlin (Orange)", "It looks upset.", false, 0, "item/gremlin_orange");
+  static GREMLIN_YELLOW = new this(325, "Wild Gremlin (Yellow)", "It looks upset.", false, 0, "item/gremlin_yellow");
+  static {
+    this.end();
+  }
+};
+
+// src/constants/ShapeEnum.ts
+var Shape = class extends Enum {
+  constructor(v, vertices) {
+    super(v);
+    this.vertices = vertices;
+  }
+  static BLOCK = new this(0, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static RAMP_UR = new this(1, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: -0.5, y: 0.5 }]);
+  static RAMP_DR = new this(2, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static RAMP_DL = new this(3, [{ x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static RAMP_UL = new this(4, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }]);
+  static SLAB_U = new this(5, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: -0.5, y: 0 }]);
+  static SLAB_R = new this(6, [{ x: -0.5, y: -0.5 }, { x: 0, y: -0.5 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static SLAB_D = new this(7, [{ x: -0.5, y: 0 }, { x: 0.5, y: 0 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static SLAB_L = new this(8, [{ x: 0, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0, y: 0.5 }]);
+  static HALF_RAMP_1_U = new this(9, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: -0.5, y: 0 }]);
+  static HALF_RAMP_1_R = new this(10, [{ x: -0.5, y: -0.5 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_1_D = new this(11, [{ x: 0.5, y: 0 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_1_L = new this(12, [{ x: 0, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }]);
+  static HALF_RAMP_2_U = new this(13, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_2_R = new this(14, [{ x: -0.5, y: -0.5 }, { x: 0, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_2_D = new this(15, [{ x: -0.5, y: 0 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_2_L = new this(16, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0, y: 0.5 }]);
+  static HALF_RAMP_1_UI = new this(17, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0 }]);
+  static HALF_RAMP_1_RI = new this(18, [{ x: -0.5, y: -0.5 }, { x: 0, y: -0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_1_DI = new this(19, [{ x: -0.5, y: 0 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_1_LI = new this(20, [{ x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0, y: 0.5 }]);
+  static HALF_RAMP_2_UI = new this(21, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0 }]);
+  static HALF_RAMP_2_RI = new this(22, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_2_DI = new this(23, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_2_LI = new this(24, [{ x: 0, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_3_U = new this(25, [{ x: -0.5, y: 0 }, { x: 0.5, y: 0 }, { x: -0.5, y: 0.5 }]);
+  static HALF_RAMP_3_R = new this(26, [{ x: 0, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0, y: 0.5 }]);
+  static HALF_RAMP_3_D = new this(27, [{ x: 0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: -0.5, y: 0 }]);
+  static HALF_RAMP_3_L = new this(28, [{ x: -0.5, y: -0.5 }, { x: 0, y: -0.5 }, { x: 0, y: 0.5 }]);
+  static HALF_RAMP_3_UI = new this(29, [{ x: -0.5, y: 0 }, { x: 0.5, y: 0 }, { x: 0.5, y: 0.5 }]);
+  static HALF_RAMP_3_RI = new this(30, [{ x: 0, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0, y: 0.5 }]);
+  static HALF_RAMP_3_DI = new this(31, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: -0.5, y: 0 }]);
+  static HALF_RAMP_3_LI = new this(32, [{ x: 0, y: -0.5 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static QUARTER_UR = new this(33, [{ x: -0.5, y: -0.5 }, { x: 0, y: -0.5 }, { x: 0, y: 0 }, { x: -0.5, y: 0 }]);
+  static QUARTER_DR = new this(34, [{ x: -0.5, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static QUARTER_DL = new this(35, [{ x: 0, y: 0 }, { x: 0.5, y: 0 }, { x: 0.5, y: 0.5 }, { x: 0, y: 0.5 }]);
+  static QUARTER_UL = new this(36, [{ x: 0, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: 0, y: 0 }]);
+  static QUARTER_RAMP_UR = new this(37, [{ x: -0.5, y: -0.5 }, { x: 0, y: -0.5 }, { x: -0.5, y: 0 }]);
+  static QUARTER_RAMP_DR = new this(38, [{ x: -0.5, y: 0 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static QUARTER_RAMP_DL = new this(39, [{ x: 0.5, y: 0 }, { x: 0.5, y: 0.5 }, { x: 0, y: 0.5 }]);
+  static QUARTER_RAMP_UL = new this(40, [{ x: 0, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0 }]);
+  static BEVEL_UR = new this(41, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static BEVEL_DR = new this(42, [{ x: -0.5, y: -0.5 }, { x: 0, y: -0.5 }, { x: 0.5, y: 0 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }]);
+  static BEVEL_DL = new this(43, [{ x: 0, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: 0 }]);
+  static BEVEL_UL = new this(44, [{ x: -0.5, y: -0.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0, y: 0.5 }, { x: -0.5, y: 0 }]);
+  static {
+    this.end();
+  }
+};
 
 // src/BuildCmd.ts
 var BuildCmd = class extends BPCmd {
@@ -107,7 +361,7 @@ var BuildCmd = class extends BPCmd {
       Object.defineProperty(this, prop, { configurable: false });
     if (input != null) {
       if (Object.getPrototypeOf(input) != Object.prototype)
-        throw new TypeError("input must be an Object literal");
+        throw new TypeError("input must be an object literal");
       this.set(input);
     }
   }
@@ -117,9 +371,9 @@ var BuildCmd = class extends BPCmd {
   fillFromArray(arr) {
     this.x = arr[1 /* X */];
     this.y = arr[2 /* Y */];
-    this.item = arr[3 /* ITEM */];
+    this.item = Item.getById(arr[3 /* ITEM */]);
     this.bits = typeof arr[4 /* BITS */] != "undefined" ? new BuildBits(arr[4 /* BITS */]) : void 0;
-    this.shape = arr[5 /* SHAPE */];
+    this.shape = Shape.getByValue(arr[5 /* SHAPE */]);
     return this;
   }
   toArray() {
@@ -130,11 +384,11 @@ var BuildCmd = class extends BPCmd {
     if (this.y !== void 0)
       arr[2 /* Y */] = this.y;
     if (this.item !== void 0)
-      arr[3 /* ITEM */] = this.item;
+      arr[3 /* ITEM */] = this.item.id;
     if (this.bits !== void 0)
       arr[4 /* BITS */] = this.bits.int;
-    if (this.shape !== void 0 && this.shape != 0) {
-      arr[5 /* SHAPE */] = this.shape;
+    if (this.shape !== void 0 && this.shape != Shape.BLOCK) {
+      arr[5 /* SHAPE */] = this.shape.enumValue;
       if (typeof arr[4 /* BITS */] == "undefined")
         arr[4 /* BITS */] = 1n;
     }
@@ -148,63 +402,74 @@ var BuildCmd = class extends BPCmd {
   }
 };
 
-// src/types.ts
-var PusherMode = /* @__PURE__ */ ((PusherMode2) => {
-  PusherMode2[PusherMode2["PUSH"] = 0] = "PUSH";
-  PusherMode2[PusherMode2["PULL"] = 1] = "PULL";
-  PusherMode2[PusherMode2["DO_NOTHING"] = 2] = "DO_NOTHING";
-  return PusherMode2;
-})(PusherMode || {});
-var LoaderPoint = /* @__PURE__ */ ((LoaderPoint2) => {
-  LoaderPoint2[LoaderPoint2["TOP_LEFT"] = 0] = "TOP_LEFT";
-  LoaderPoint2[LoaderPoint2["TOP"] = 1] = "TOP";
-  LoaderPoint2[LoaderPoint2["TOP_RIGHT"] = 2] = "TOP_RIGHT";
-  LoaderPoint2[LoaderPoint2["LEFT"] = 3] = "LEFT";
-  LoaderPoint2[LoaderPoint2["RIGHT"] = 4] = "RIGHT";
-  LoaderPoint2[LoaderPoint2["BOTTOM_LEFT"] = 5] = "BOTTOM_LEFT";
-  LoaderPoint2[LoaderPoint2["BOTTOM"] = 6] = "BOTTOM";
-  LoaderPoint2[LoaderPoint2["BOTTOM_RIGHT"] = 7] = "BOTTOM_RIGHT";
-  return LoaderPoint2;
-})(LoaderPoint || {});
-var LoaderPriority = /* @__PURE__ */ ((LoaderPriority2) => {
-  LoaderPriority2[LoaderPriority2["LOW"] = 0] = "LOW";
-  LoaderPriority2[LoaderPriority2["NORMAL"] = 1] = "NORMAL";
-  LoaderPriority2[LoaderPriority2["HIGH"] = 2] = "HIGH";
-  return LoaderPriority2;
-})(LoaderPriority || {});
-var FilterMode = /* @__PURE__ */ ((FilterMode2) => {
-  FilterMode2[FilterMode2["ALLOW_ALL"] = 0] = "ALLOW_ALL";
-  FilterMode2[FilterMode2["BLOCK_FILTER_ONLY"] = 1] = "BLOCK_FILTER_ONLY";
-  FilterMode2[FilterMode2["ALLOW_FILTER_ONLY"] = 2] = "ALLOW_FILTER_ONLY";
-  FilterMode2[FilterMode2["BLOCK_ALL"] = 3] = "BLOCK_ALL";
-  return FilterMode2;
-})(FilterMode || {});
-var FixedAngle = /* @__PURE__ */ ((FixedAngle2) => {
-  FixedAngle2[FixedAngle2["RIGHT"] = 0] = "RIGHT";
-  FixedAngle2[FixedAngle2["UP"] = 1] = "UP";
-  FixedAngle2[FixedAngle2["LEFT"] = 2] = "LEFT";
-  FixedAngle2[FixedAngle2["DOWN"] = 3] = "DOWN";
-  return FixedAngle2;
-})(FixedAngle || {});
+// src/constants/public.ts
+var PREFIX = "DSA:";
+var PusherMode = class extends Enum {
+  static PUSH = new this(0);
+  static PULL = new this(1);
+  static DO_NOTHING = new this(2);
+  static {
+    this.end();
+  }
+};
+var LoaderPoint = class extends Enum {
+  static TOP_LEFT = new this(0);
+  static TOP = new this(1);
+  static TOP_RIGHT = new this(2);
+  static LEFT = new this(3);
+  static RIGHT = new this(4);
+  static BOTTOM_LEFT = new this(5);
+  static BOTTOM = new this(6);
+  static BOTTOM_RIGHT = new this(7);
+  static {
+    this.end();
+  }
+};
+var LoaderPriority = class extends Enum {
+  static LOW = new this(0);
+  static NORMAL = new this(1);
+  static HIGH = new this(2);
+  static {
+    this.end();
+  }
+};
+var FilterMode = class extends Enum {
+  static ALLOW_ALL = new this(0);
+  static BLOCK_FILTER_ONLY = new this(1);
+  static ALLOW_FILTER_ONLY = new this(2);
+  static BLOCK_ALL = new this(3);
+  static {
+    this.end();
+  }
+};
+var FixedAngle = class extends Enum {
+  static RIGHT = new this(0);
+  static UP = new this(1);
+  static LEFT = new this(2);
+  static DOWN = new this(3);
+  static {
+    this.end();
+  }
+};
 
 // src/ConfigCmd.ts
 var defaults = {
-  filterMode: 0 /* ALLOW_ALL */,
-  filterItems: [0, 0, 0],
+  filterMode: FilterMode.ALLOW_ALL,
+  filterItems: [Item.NULL, Item.NULL, Item.NULL],
   angle: 0,
-  fixedAngle: 0 /* RIGHT */,
+  fixedAngle: FixedAngle.RIGHT,
   pusher: {
-    defaultMode: 2 /* DO_NOTHING */,
-    filteredMode: 0 /* PUSH */,
+    defaultMode: PusherMode.DO_NOTHING,
+    filteredMode: PusherMode.PUSH,
     angle: 0,
     targetSpeed: 20,
     filterByInventory: false,
     maxBeamLength: 1e3
   },
   loader: {
-    pickupPoint: 3 /* LEFT */,
-    dropPoint: 4 /* RIGHT */,
-    priority: 1 /* NORMAL */,
+    pickupPoint: LoaderPoint.LEFT,
+    dropPoint: LoaderPoint.RIGHT,
+    priority: LoaderPriority.NORMAL,
     stackLimit: 16,
     cycleTime: 20,
     requireOutputInventory: false,
@@ -228,7 +493,7 @@ var ConfigCmd = class extends BPCmd {
   }
   static set defaults(input) {
     if (input != null && Object.getPrototypeOf(input) != Object.prototype)
-      throw new TypeError("defaults can only be set to an Object literal");
+      throw new TypeError("defaults can only be set to an object literal");
     defaults = input;
   }
   rawData;
@@ -244,7 +509,7 @@ var ConfigCmd = class extends BPCmd {
       Object.defineProperty(this, prop, { configurable: false });
     if (input != null) {
       if (Object.getPrototypeOf(input) != Object.prototype)
-        throw new TypeError("input must be an Object literal");
+        throw new TypeError("input must be an object literal");
       this.set(input);
     }
   }
@@ -290,7 +555,17 @@ var ConfigCmd = class extends BPCmd {
       const msgKey = msgKey_prop[prop] ?? prop;
       if (val === void 0)
         continue;
-      if (val === null || Object.getPrototypeOf(val) == Object.prototype) {
+      if (msgKey == "filter_config" /* FILTER_CONFIG */) {
+        val = [(val ?? defaults.filterMode).enumValue];
+      } else if (msgKey == "filter_items" /* FILTER_ITEMS */) {
+        if (val === null)
+          val = defaults.filterItems;
+        else
+          for (let i = 0; i < val.length; i++)
+            val[i] = (val[i] ?? defaults.filterItems[i]).enumValue;
+      } else if (msgKey == "angle_fixed" /* ANGLE_FIXED */) {
+        val = [(val ?? defaults.fixedAngle).enumValue];
+      } else if (val === null || Object.getPrototypeOf(val) == Object.prototype) {
         if (val !== null && !Object.keys(val).length)
           continue;
         val = cfgObjToArr(msgKey, val);
@@ -324,17 +599,19 @@ function deepEquals(a, b) {
 }
 function cfgArrToObj(key, arr) {
   switch (key) {
-    case "filter_config" /* FILTER_CONFIG */:
     case "angle" /* ANGLE */:
-    case "angle_fixed" /* ANGLE_FIXED */:
       return arr[0];
+    case "filter_config" /* FILTER_CONFIG */:
+      return FilterMode.getByValue(arr[0]);
     case "filter_items" /* FILTER_ITEMS */:
+      for (let i = 0; i < arr.length; i++)
+        arr[i] = Item.getById(arr[i]);
       return arr;
     case "config_loader" /* LOADER */:
       return {
-        pickupPoint: arr[0 /* PICKUP_POINT */],
-        dropPoint: arr[1 /* DROP_POINT */],
-        priority: arr[2 /* PRIORTY */],
+        pickupPoint: LoaderPoint.getByValue(arr[0 /* PICKUP_POINT */]),
+        dropPoint: LoaderPoint.getByValue(arr[1 /* DROP_POINT */]),
+        priority: LoaderPriority.getByValue(arr[2 /* PRIORTY */]),
         stackLimit: arr[3 /* STACK_LIMIT */],
         cycleTime: arr[4 /* CYCLE_TIME */],
         requireOutputInventory: arr[5 /* REQUIRE_OUTPUT_INVENTORY */],
@@ -342,13 +619,15 @@ function cfgArrToObj(key, arr) {
       };
     case "config_pusher" /* PUSHER */:
       return {
-        defaultMode: arr[0 /* DEFAULT_MODE */],
-        filteredMode: arr[1 /* FILTERED_MODE */],
+        defaultMode: PusherMode.getByValue(arr[0 /* DEFAULT_MODE */]),
+        filteredMode: PusherMode.getByValue(arr[1 /* FILTERED_MODE */]),
         angle: arr[2 /* ANGLE */],
         targetSpeed: arr[3 /* TARGET_SPEED */],
         filterByInventory: arr[4 /* FILTER_BY_INVENTORY */],
         maxBeamLength: arr[5 /* MAX_BEAM_LENGTH */]
       };
+    case "angle_fixed" /* ANGLE_FIXED */:
+      return FixedAngle.getByValue(arr[0]);
   }
 }
 function cfgObjToArr(key, obj) {
@@ -361,24 +640,23 @@ function cfgObjToArr(key, obj) {
   switch (key) {
     case "config_loader" /* LOADER */:
       obj = { ...defaults.loader, ...obj };
-      a[0 /* PICKUP_POINT */] = obj.pickupPoint;
-      a[1 /* DROP_POINT */] = obj.dropPoint;
-      a[2 /* PRIORTY */] = obj.priority;
+      a[0 /* PICKUP_POINT */] = obj.pickupPoint?.enumValue;
+      a[1 /* DROP_POINT */] = obj.dropPoint?.enumValue;
+      a[2 /* PRIORTY */] = obj.priority?.enumValue;
       a[3 /* STACK_LIMIT */] = obj.stackLimit;
       a[4 /* CYCLE_TIME */] = obj.cycleTime;
       a[5 /* REQUIRE_OUTPUT_INVENTORY */] = obj.requireOutputInventory;
       a[6 /* WAIT_FOR_STACK_LIMIT */] = obj.waitForStackLimit;
       break;
-    case "config_pusher" /* PUSHER */: {
+    case "config_pusher" /* PUSHER */:
       obj = { ...defaults.pusher, ...obj };
-      a[0 /* DEFAULT_MODE */] = obj.defaultMode;
-      a[1 /* FILTERED_MODE */] = obj.filteredMode;
+      a[0 /* DEFAULT_MODE */] = obj.defaultMode?.enumValue;
+      a[1 /* FILTERED_MODE */] = obj.filteredMode?.enumValue;
       a[2 /* ANGLE */] = obj.angle;
       a[3 /* TARGET_SPEED */] = obj.targetSpeed;
       a[4 /* FILTER_BY_INVENTORY */] = obj.filterByInventory;
       a[5 /* MAX_BEAM_LENGTH */] = obj.maxBeamLength;
       break;
-    }
   }
   return a;
 }
@@ -392,24 +670,24 @@ var Blueprint = class {
   constructor(input) {
     for (const prop in this)
       Object.defineProperty(this, prop, { configurable: false });
-    if (typeof input == "undefined") {
+    if (input == null) {
       this.version = 0;
       this.width = 1;
       this.height = 1;
       this.commands = [];
-    } else if (input != null && Object.getPrototypeOf(input) == Object.prototype) {
+    } else if (Object.getPrototypeOf(input) == Object.prototype) {
       this.version = input.version ?? 0;
       this.width = input.width ?? 1;
       this.height = input.height ?? 1;
-      if (input.commands != null) {
+      if (input.commands == null) {
+        this.commands = [];
+      } else {
         if (!Array.isArray(input.commands))
           throw new TypeError("input.commands must be an array");
         this.commands = input.commands;
-      } else {
-        this.commands = [];
       }
     } else {
-      throw new TypeError("input must be an Object literal");
+      throw new TypeError("input must be an object literal");
     }
   }
   set(input) {
@@ -629,9 +907,7 @@ var slc = function(v, s, e) {
     s = 0;
   if (e == null || e > v.length)
     e = v.length;
-  var n = new u8(e - s);
-  n.set(v.subarray(s, e));
-  return n;
+  return new u8(v.subarray(s, e));
 };
 var ec = [
   "unexpected EOF",
@@ -663,9 +939,10 @@ var inflt = function(dat, st, buf, dict) {
   var sl = dat.length, dl = dict ? dict.length : 0;
   if (!sl || st.f && !st.l)
     return buf || new u8(0);
-  var noBuf = !buf || st.i != 2;
+  var noBuf = !buf;
+  var resize = noBuf || st.i != 2;
   var noSt = st.i;
-  if (!buf)
+  if (noBuf)
     buf = new u8(sl * 3);
   var cbuf = function(l2) {
     var bl = buf.length;
@@ -689,7 +966,7 @@ var inflt = function(dat, st, buf, dict) {
             err(0);
           break;
         }
-        if (noBuf)
+        if (resize)
           cbuf(bt + l);
         buf.set(dat.subarray(s, t), bt);
         st.b = bt += l, st.p = pos = t * 8, st.f = final;
@@ -739,7 +1016,7 @@ var inflt = function(dat, st, buf, dict) {
         break;
       }
     }
-    if (noBuf)
+    if (resize)
       cbuf(bt + 131072);
     var lms = (1 << lbt) - 1, dms = (1 << dbt) - 1;
     var lpos = pos;
@@ -779,7 +1056,7 @@ var inflt = function(dat, st, buf, dict) {
             err(0);
           break;
         }
-        if (noBuf)
+        if (resize)
           cbuf(bt + 131072);
         var end = bt + add;
         if (bt < dt) {
@@ -789,20 +1066,15 @@ var inflt = function(dat, st, buf, dict) {
           for (; bt < dend; ++bt)
             buf[bt] = dict[shift + bt];
         }
-        for (; bt < end; bt += 4) {
+        for (; bt < end; ++bt)
           buf[bt] = buf[bt - dt];
-          buf[bt + 1] = buf[bt + 1 - dt];
-          buf[bt + 2] = buf[bt + 2 - dt];
-          buf[bt + 3] = buf[bt + 3 - dt];
-        }
-        bt = end;
       }
     }
     st.l = lm, st.p = lpos, st.b = bt, st.f = final;
     if (lm)
       final = 1, st.m = lbt, st.d = dm, st.n = dbt;
   } while (!final);
-  return bt == buf.length ? buf : slc(buf, 0, bt);
+  return bt != buf.length && noBuf ? slc(buf, 0, bt) : buf.subarray(0, bt);
 };
 var wbits = function(d, p, v) {
   v <<= p & 7;
@@ -1665,12 +1937,15 @@ export {
   ConfigCmd,
   Decoder,
   Encoder,
+  Enum,
   FilterMode,
   FixedAngle,
+  Item,
   LoaderPoint,
   LoaderPriority,
   PREFIX,
   PusherMode,
+  Shape,
   decode,
   decodeConfigCmd,
   decodeConfigCmdSync,

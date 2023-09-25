@@ -1,104 +1,105 @@
-import items from "./assets/items.js"
 // eslint-disable-next-line no-unused-vars
-import { Blueprint, BuildBits, BuildCmd, ConfigCmd } from "../assets/lib/dsabp-js/index.min.js"
+import { Blueprint, BuildBits, BuildCmd, ConfigCmd, Item, LoaderPoint, Shape } from "../assets/lib/dsabp-js/index.min.js"
 
-const shape = {
-	H: {
-		4: 1,
-		3: 2,
-		8: 6,
-		17: 9,
-		21: 13,
-		16: 22,
-		12: 18,
-		11: 19,
-		15: 23,
-		24: 14,
-		20: 10,
-		29: 25,
-		27: 31,
-		28: 30,
-		32: 26,
-		36: 33,
-		35: 34,
-		40: 37,
-		39: 38,
-		44: 41,
-		43: 42
-	},
-	V: {
-		4: 3,
-		1: 2,
-		5: 7,
-		17: 11,
-		21: 15,
-		23: 13,
-		19: 9,
-		24: 16,
-		20: 12,
-		10: 18,
-		14: 22,
-		29: 27,
-		31: 25,
-		28: 32,
-		26: 30,
-		36: 35,
-		33: 34,
-		40: 39,
-		38: 37,
-		44: 43,
-		42: 41
-	}
+const shapeFlipMap = {
+	H: new Map([
+		[Shape.RAMP_DL, Shape.RAMP_DR],
+		[Shape.RAMP_UL, Shape.RAMP_UR],
+		[Shape.SLAB_L, Shape.SLAB_R],
+		[Shape.HALF_RAMP_1_D, Shape.HALF_RAMP_1_DI],
+		[Shape.HALF_RAMP_1_L, Shape.HALF_RAMP_1_RI],
+		[Shape.HALF_RAMP_2_D, Shape.HALF_RAMP_2_DI],
+		[Shape.HALF_RAMP_2_L, Shape.HALF_RAMP_2_RI],
+		[Shape.HALF_RAMP_1_UI, Shape.HALF_RAMP_1_U],
+		[Shape.HALF_RAMP_1_LI, Shape.HALF_RAMP_1_R],
+		[Shape.HALF_RAMP_2_UI, Shape.HALF_RAMP_2_U],
+		[Shape.HALF_RAMP_2_LI, Shape.HALF_RAMP_2_R],
+		[Shape.HALF_RAMP_3_D, Shape.HALF_RAMP_3_DI],
+		[Shape.HALF_RAMP_3_L, Shape.HALF_RAMP_3_RI],
+		[Shape.HALF_RAMP_3_UI, Shape.HALF_RAMP_3_U],
+		[Shape.HALF_RAMP_3_LI, Shape.HALF_RAMP_3_R],
+		[Shape.QUARTER_DL, Shape.QUARTER_DR],
+		[Shape.QUARTER_UL, Shape.QUARTER_UR],
+		[Shape.QUARTER_RAMP_DL, Shape.QUARTER_RAMP_DR],
+		[Shape.QUARTER_RAMP_UL, Shape.QUARTER_RAMP_UR],
+		[Shape.BEVEL_DL, Shape.BEVEL_DR],
+		[Shape.BEVEL_UL, Shape.BEVEL_UR]
+	]),
+	V: new Map([
+		[Shape.RAMP_UR, Shape.RAMP_DR],
+		[Shape.RAMP_UL, Shape.RAMP_DL],
+		[Shape.SLAB_U, Shape.SLAB_D],
+		[Shape.HALF_RAMP_1_R, Shape.HALF_RAMP_1_RI],
+		[Shape.HALF_RAMP_2_R, Shape.HALF_RAMP_2_RI],
+		[Shape.HALF_RAMP_1_UI, Shape.HALF_RAMP_1_D],
+		[Shape.HALF_RAMP_1_DI, Shape.HALF_RAMP_1_U],
+		[Shape.HALF_RAMP_1_LI, Shape.HALF_RAMP_1_L],
+		[Shape.HALF_RAMP_2_UI, Shape.HALF_RAMP_2_D],
+		[Shape.HALF_RAMP_2_DI, Shape.HALF_RAMP_2_U],
+		[Shape.HALF_RAMP_2_LI, Shape.HALF_RAMP_2_L],
+		[Shape.HALF_RAMP_3_R, Shape.HALF_RAMP_3_RI],
+		[Shape.HALF_RAMP_3_L, Shape.HALF_RAMP_3_LI],
+		[Shape.HALF_RAMP_3_UI, Shape.HALF_RAMP_3_D],
+		[Shape.HALF_RAMP_3_DI, Shape.HALF_RAMP_3_U],
+		[Shape.QUARTER_UR, Shape.QUARTER_DR],
+		[Shape.QUARTER_UL, Shape.QUARTER_DL],
+		[Shape.QUARTER_RAMP_DR, Shape.QUARTER_RAMP_UR],
+		[Shape.QUARTER_RAMP_UL, Shape.QUARTER_RAMP_DL],
+		[Shape.BEVEL_DR, Shape.BEVEL_UR],
+		[Shape.BEVEL_UL, Shape.BEVEL_DL]
+	])
 }
-for (const key in shape.H) shape.H[shape.H[key]] = key
-for (const key in shape.V) shape.V[shape.V[key]] = key
+const loaderFlipMap = {
+	H: new Map([
+		[LoaderPoint.TOP_LEFT, LoaderPoint.TOP_RIGHT],
+		[LoaderPoint.LEFT, LoaderPoint.RIGHT],
+		[LoaderPoint.BOTTOM_LEFT, LoaderPoint.BOTTOM_RIGHT]
+	]),
+	V: new Map([
+		[LoaderPoint.TOP_LEFT, LoaderPoint.BOTTOM_LEFT],
+		[LoaderPoint.TOP, LoaderPoint.BOTTOM],
+		[LoaderPoint.TOP_RIGHT, LoaderPoint.BOTTOM_RIGHT]
+	])
+}
 
-const loader = {
-	H: {
-		0: 2,
-		3: 4,
-		5: 7
-	},
-	V: {
-		0: 5,
-		1: 6,
-		2: 7
-	}
+for (const D of ["H", "V"]) {
+	for (const [k, v] of shapeFlipMap[D])
+		shapeFlipMap[D].set(v, k)
+	for (const [k, v] of loaderFlipMap[D])
+		loaderFlipMap[D].set(v, k)
 }
-for (const key in loader.H) loader.H[loader.H[key]] = key
-for (const key in loader.V) loader.V[loader.V[key]] = key
 
 /**
  * @param {Blueprint} bp
- * @param {"H"|"V"} d direction
+ * @param {"H"|"V"} D direction
  */
-export function flip(bp, d) {
+export function flip(bp, D) {
 	for (const cmd of bp.commands) {
 		if (cmd instanceof ConfigCmd) {
 			if (cmd.loader?.pickupPoint != null)
-				cmd.loader.pickupPoint = parseInt(loader[d][cmd.loader.pickupPoint] ?? cmd.loader.pickupPoint)
+				cmd.loader.pickupPoint = loaderFlipMap[D].get(cmd.loader.pickupPoint) ?? cmd.loader.pickupPoint
 			if (cmd.loader?.dropPoint != null)
-				cmd.loader.dropPoint = parseInt(loader[d][cmd.loader.dropPoint] ?? cmd.loader.dropPoint)
+				cmd.loader.dropPoint = loaderFlipMap[D].get(cmd.loader.dropPoint) ?? cmd.loader.dropPoint
 			if (cmd.pusher?.angle != null) {
-				cmd.pusher.angle = (d == "H" ? 180 : 360) - cmd.pusher?.angle
+				cmd.pusher.angle = (D == "H" ? 180 : 360) - cmd.pusher?.angle
 				if (cmd.pusher.angle < 0)
 					cmd.pusher.angle += 360
 			}
 			if (cmd.angle != null) {
-				cmd.angle = (d == "H" ? 180 : 360) - cmd.angle
+				cmd.angle = (D == "H" ? 180 : 360) - cmd.angle
 				if (cmd.angle < 0)
 					cmd.angle += 360
 			}
 		} else if (cmd instanceof BuildCmd) {
 			if (cmd.shape)
-				cmd.shape = parseInt(shape[d][cmd.shape] ?? cmd.shape)
-			if (d == "H") {
+				cmd.shape = shapeFlipMap[D].get(cmd.shape) ?? cmd.shape
+			if (D == "H") {
 				if (cmd.bits) {
 					cmd.bits = new BuildBits(cmd.bits.toString().split("").reduce((r, c) => c + r))
 					cmd.x += cmd.bits.size - 1
 				}
 				cmd.x = bp.width - cmd.x - 1
-			} else if (d == "V") {
+			} else if (D == "V") {
 				cmd.y = bp.height - cmd.y - 1
 			}
 		}
@@ -203,7 +204,7 @@ export function rotate(bp, angle) {
 
 /**
  * @param {Blueprint} bp
- * @param {{search: Array<string>, replacement: string}} options
+ * @param {{search: string[], replacement: string}} options
  * @returns {number} Replaced amount
  */
 export function replace(bp, options) {
@@ -211,12 +212,13 @@ export function replace(bp, options) {
 	const del = replacement == ""
 	let amount = 0
 
-	const searchIds = new Set(itemInputsToIds(search))
-	const doSearchAir = searchIds.has(-1)
+	const searchItems = new Set(resolveItemInputs(search))
+	const doSearchAir = searchItems.has(Item.NULL)
 
-	const replacementId = !del ? (!isNaN(replacement) ? parseInt(replacement) : itemNameToIds(replacement)[0]) : 0
+	const replacementItem = del ? Item.NULL
+		: !isNaN(replacement) ? Item.getById(parseInt(replacement)) : resolveItemName(replacement)[0]
 
-	if (!del && isNaN(replacementId)) return amount
+	if (replacementItem == null) return amount
 
 	const filled = new Set()
 	let i = bp.commands.length
@@ -236,12 +238,12 @@ export function replace(bp, options) {
 			}
 		}
 
-		if (searchIds.has(cmd.item)) {
+		if (searchItems.has(cmd.item)) {
 			if (del) {
 				bp.commands.splice(i, 1)
 			} else {
-				cmd.item = replacementId
-				if (!items.isPlaceable(replacementId))
+				cmd.item = replacementItem
+				if (!replacementItem.isBuildable)
 					cmd.shape = undefined
 			}
 			++amount
@@ -250,12 +252,12 @@ export function replace(bp, options) {
 
 	stripRedundantCfgCmds(bp)
 
-	if (doSearchAir) { // air
+	if (doSearchAir) {
 		expandBuildBits(bp)
 		for (let x = 0; x < bp.width; x++) {
 			for (let y = 0; y < bp.height; y++) {
 				if (!filled.has(`${x},${y}`)) {
-					bp.commands.push(new BuildCmd({ x, y, item: replacementId }))
+					bp.commands.push(new BuildCmd({ x, y, item: replacementItem }))
 					++amount
 				}
 			}
@@ -266,7 +268,7 @@ export function replace(bp, options) {
 	return amount
 }
 
-function itemInputsToIds(inputs) {
+function resolveItemInputs(inputs) {
 	const output = []
 	/** @type {Set<"block"|"placeable"|"nonplaceable"|"bigmac"|"smallmac"|"hull">} */
 	const categories = new Set()
@@ -279,30 +281,38 @@ function itemInputsToIds(inputs) {
 		else if (s == "1x1 machine" || s == "small machine") categories.add("smallmac")
 		else if (s == "hull mounted" || s == "hull-mounted" || s == "hull") categories.add("hull")
 		else // not a category
-			!isNaN(s) ? output.push(parseInt(s)) : output.push(...itemNameToIds(s))
+			!isNaN(s) ? output.push(Item.getById(parseInt(s))) : output.push(...resolveItemName(s))
 	}
 
+	/** @param {Item} i */
+	const isBigMac = i => i.buildInfo?.[0]?.bounds.x > 1 || i.buildInfo?.[0]?.bounds.y > 1
+
 	if (categories.size) {
-		items.ids.forEach(id => {
-			if (categories.has("block") && items.isBlock(id)
-				|| categories.has("placeable") && items.isPlaceable(id)
-				|| categories.has("nonplaceable") && !items.isPlaceable(id)
-				|| categories.has("bigmac") && items.isBigMac(id)
-				|| categories.has("smallmac") && items.isSmallMac(id)
-				|| categories.has("hull") && items.isHull(id)
+		for (const item of Item.getMap().values()) {
+			if (categories.has("block") && item.isBlock
+				|| categories.has("placeable") && item.isBuildable
+				|| categories.has("nonplaceable") && !item.isBuildable
+				|| categories.has("bigmac") && item.isBuildable && !item.isBlock && isBigMac(item)
+				|| categories.has("smallmac") && item.isBuildable && !item.isBlock && !isBigMac(item)
+				|| categories.has("hull") && item.isBuildable && item.buildInfo?.[0]?.require_blocks?.[0].block.includes("HULL")
 			)
-				output.push(parseInt(id))
-		})
+				output.push(item)
+		}
 	}
 	return output
 }
 
-function itemNameToIds(name) {
-	return items.ids.reduce((arr, id) => (
-		name == "air" ? arr.push(-1)
-			: items.getName(id).toLowerCase().includes(name) && arr.push(parseInt(id))
-		, arr
-	), [])
+/** Item name to items */
+function resolveItemName(name) {
+	if (name == "air")
+		return [Item.NULL]
+
+	const output = []
+	for (const item of Item.getMap().values()) {
+		if (item.name.toLowerCase().includes(name))
+			output.push(item)
+	}
+	return output
 }
 
 /**
@@ -329,7 +339,7 @@ function makeBuildBits(bp) {
 		}
 	}
 
-	/** @type {Object<string, Array<BuildCmdGroup>>} */
+	/** @type {Object<string, BuildCmdGroup[]>} */
 	const rows = {}
 	let currentCfg
 	for (const cmd of bp.commands) {
@@ -352,7 +362,7 @@ function makeBuildBits(bp) {
 	const rowsValues = Object.values(rows)
 	for (let i = rowsValues.length - 1; i >= 0; i--) { // loop in reverse so rcd start from top
 		for (const group of rowsValues[i]) {
-			const useLastCommands = group.item == 240 // box
+			const useLastCommands = group.item == Item.EXPANDO_BOX
 			cfgCmdIndex = (useLastCommands ? lastCommands : bp.commands).length
 
 			if (group.cfgCmd && !group.cfgCmd.equals(lastCfg)) {
@@ -369,6 +379,8 @@ function makeBuildBits(bp) {
 			}
 
 			group.commands.sort((a, b) => a.x - b.x) // sort x coord left to right
+
+			/** @type {BuildCmd[][]} */
 			const chunks = [[]]
 			for (const cmd of group.commands) {
 				if (cmd.x - chunks[chunks.length - 1]?.[0]?.x >= 63)
@@ -383,18 +395,20 @@ function makeBuildBits(bp) {
 						mainCmd.bits.set(Math.floor(cmd.x - mainCmd.x))
 				}
 				(useLastCommands ? lastCommands : bp.commands)
-					.splice(items.isBlock(mainCmd.item) ? lastBlockIndex++ : cfgCmdIndex + 1, 0, mainCmd)
+					.splice(mainCmd.item.isBlock ? lastBlockIndex++ : cfgCmdIndex + 1, 0, mainCmd)
 			}
 		}
 	}
 	bp.commands.push(...lastCommands)
 
+	/** @param {BuildCmd} cmd */
 	function findGroup(cmd) {
 		for (const group of rows[cmd.y]) {
 			if ((Math.abs(group.commands[0].x % 1 - cmd.x % 1) / group.commands[0].x || 0) == 0
 				&& group.item == cmd.item
 				&& group.shape == cmd.shape
-				&& ((group.cfgCmd && currentCfg) ? group.cfgCmd.equals(currentCfg) : true))
+				&& ((group.cfgCmd && currentCfg) ? group.cfgCmd.equals(currentCfg) : true)
+			)
 				return group
 		}
 	}

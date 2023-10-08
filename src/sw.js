@@ -17,7 +17,7 @@ for (const p of (" main.css main.js converter.js worker.js assets/bg_ship.png as
 for (const p of (" main.css main.js operations.js").split(" "))
 	cacheUrls.push("bpeditor/" + p)
 
-const fetchFirstList = new RegExp(`/item_schema\\.json$|${location.origin}/($|bpbin/\\w*)`)
+const fetchFirstList = new RegExp(`/item_schema\\.json$|${location.origin}/($|bpbin/\\w*|main.css)`)
 const noCacheList = /\/bpbin\/\w+|\/\/res.cloudinary.com\//
 
 self.addEventListener("install", e => {

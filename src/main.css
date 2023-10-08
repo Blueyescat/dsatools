@@ -3,15 +3,14 @@
 	--body-color: #16181c;
 	--container-color: #26292f;
 	--theme-color: #1E7EAE;
+	--blue: #1cb2fd;
 	--input-border-color: #696f75;
 	--button-color: hsl(221, 12%, 32%);
 	--button-hover-color: hsl(221, 12%, 28%);
 	--button-active-color: hsl(221, 12%, 25%);
-	/* --blue: hsl(209, 84%, 70%); */
-	--blue: hsl(200, 98%, 55%);
-	/* ORG :  hsl(200, 69%, 49%); */
-	--button-colored-hover-color: hsl(200, 98%, 47%);
-	--button-colored-active-color: hsl(200, 98%, 43%);
+	--button-colored-color: hsl(200, 69%, 43%);
+	--button-colored-hover-color: hsl(200, 69%, 38%);
+	--button-colored-active-color: hsl(200, 69%, 35%);
 }
 
 html {
@@ -69,7 +68,7 @@ input[type="button"] {
 button.colored,
 input[type="button"].colored {
 	background-color: transparent;
-	border: 2px solid var(--blue);
+	border: 2px solid var(--button-colored-color);
 	box-sizing: border-box;
 }
 
@@ -457,6 +456,7 @@ footer {
 	padding: 5px;
 	cursor: pointer;
 	display: inline-block;
+	user-select: none;
 }
 
 .radio-chips>label:hover {
@@ -476,10 +476,10 @@ footer {
 }
 
 .radio-chips>label:has(input[type="radio"]:checked) {
-	outline: 2px solid var(--blue);
+	outline: 2px solid #919191;
 }
 
-.radio-chips>label:has(input[type="radio"]:focus) {
+.radio-chips>label:has(input[type="radio"]:focus-visible) {
 	outline-color: white;
 	outline-offset: 2px;
 }

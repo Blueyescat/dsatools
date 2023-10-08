@@ -18,7 +18,7 @@ for (const p of (" main.css main.js operations.js").split(" "))
 	cacheUrls.push("bpeditor/" + p)
 
 const fetchFirstList = new RegExp(`/item_schema\\.json$|${location.origin}/($|bpbin/\\w*)`)
-const noCacheList = /\/bpbin\/\w+/
+const noCacheList = /\/bpbin\/\w+|\/\/res.cloudinary.com\//
 
 self.addEventListener("install", e => {
 	e.waitUntil(

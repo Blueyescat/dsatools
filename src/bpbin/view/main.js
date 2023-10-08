@@ -32,7 +32,13 @@ function imageReady() {
 		bounds: false,
 		initScale: 1,
 		minScale: 0.5,
-		maxScale: 16
+		maxScale: 16,
+		on: {
+			ready() {
+				imgPreview.style.pointerEvents = "auto"
+				imgPreview.draggable = false
+			}
+		}
 	})
 	document.getElementById("button-reset-zoom").addEventListener("click", () => previewZoomist?.reset())
 }

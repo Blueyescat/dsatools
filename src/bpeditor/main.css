@@ -40,20 +40,20 @@ input[type="number"] {
 
 #button-process {
 	margin: 15px 0;
-	font-size: 1.1rem;
+	font-size: 1.05em;
 	padding: 7px;
 }
 
-#result-heading>button {
-	line-height: 1rem;
+h3>button {
+	margin-left: 0.6em;
 }
 
 #replace-item-list {
 	display: inline-block;
 	max-height: 40vh;
-	max-width: auto;
 	overflow-y: scroll;
 	font-family: monospace;
+	overscroll-behavior: contain;
 }
 
 #input-replace-search {

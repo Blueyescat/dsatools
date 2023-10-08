@@ -1,5 +1,5 @@
 .custom-file-input>button {
-	font-size: 1rem;
+	font-size: 1em;
 }
 
 #input-width,
@@ -13,7 +13,7 @@
 
 #button-process {
 	margin: 15px 0;
-	font-size: 1.1rem;
+	font-size: 1.05em;
 	padding: 7px;
 }
 
@@ -31,6 +31,13 @@
 
 #result-container .zoomist-wrapper {
 	background-color: var(--container-color) !important;
+}
+
+#result-container .zoomist-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
 }
 
 #result-hover-square {

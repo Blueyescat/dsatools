@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Various tools for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="DSA Tools">
+	<meta property="og:description" content="Various tools for the Deep Space Airships game.">
+	<!-- 'property' works for Discord, don't want to change pwa theme -->
+	<meta property="theme-color" content="#1f80b1">
+	<title>DSA Tools</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script type="module" src="/assets/sw-reg.js"></script>
+	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
+	<link type="text/css" rel="stylesheet" href="/main.css">
+	<script type="module" src="/assets/goatc.js"></script>
+</head>
+<body>
+	<header></header>
+	<div id="main-container">
+		<h1>DSA Tools</h1>
+		<p>A web app for various tools for the <a href="https://drednot.io" target="_blank">Deep Space Airships</a> game.</p>
+		<ul>
+			<li>Its files are cached in the browser, so they can be used without needing to download them each time.
+				This means you don't need an internet connection to open and use the cached version of the app, except for some online features.</li>
+			<li>It can be installed on the device for quick access. Most browsers, excluding Firefox and Opera, for example, support this.
+				Your main browser doesn't really matter, just install using any browser. On desktop browsers, you should see a button on the
+				right side of your address bar to install. On mobile browsers, it may be called "add to home screen". For Safari on iOS,
+				you need to launch the installed app once after adding it to home screen.</li>
+		</ul>
+		<h2>Tools</h2>
+		<div id="charts">
+			<div class="chart">
+				<a href="/bpeditor">
+					<h3>Blueprint Editor</h3>
+				</a>
+				<p>Various blueprint editing tools: Crop, Flip, Rotate, and Replace Items.</p>
+			</div>
+			<div class="chart">
+				<a href="/bpbin">
+					<h3>Blueprint Bin</h3>
+				</a>
+				<p>WIP blueprint storing and sharing service.</p>
+			</div>
+			<div class="chart">
+				<a href="/img2pixar">
+					<h3>Image to Pixel Art</h3>
+				</a>
+				<p>Converts an image into in-game pixel art and shows which color to place where, based on the closest paint color for each pixel,
+					along with coordinates on the ship.</p>
+			</div>
+			<div class="chart">
+				<a href="/items">
+					<h3>Item List</h3>
+				</a>
+				<p>Small tool that nicely lists items in the game.</p>
+			</div>
+		</div>
+		<h3>Issues, Suggestions, and Questions</h3>
+		<p>Preferably, create a detailed issue in the GitHub repository's <a href="https://github.com/Blueyescat/dsatools/issues">Issues</a> page
+			for reporting issues, and use the <a href="https://github.com/Blueyescat/dsatools/discussions">Discussions</a> page for suggestions
+			and questions.
+			<br>You can also comment on the forum thread in the official DSA Discord server.
+		</p>
+		<footer></footer>
+	</div>
+	<script type="module">
+		const credits = `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>.`
+
+		import { loadHF } from "/main.js"
+		loadHF(credits)
+	</script>
+	<style>
+		#charts {
+			display: flex;
+			flex-flow: row wrap;
+			justify-content: space-between;
+		}
+
+		.chart {
+			background-color: var(--body-color);
+			border-radius: 8px;
+			padding: 16px;
+			padding-top: 12px;
+			--size: 25%;
+			--margin: 6px;
+			margin: var(--margin);
+			width: calc(var(--size) - (var(--margin) * 2));
+			box-sizing: border-box;
+		}
+
+		@media (max-width: 480px) {
+			.chart {
+				--size: 100%;
+			}
+		}
+
+		@media (min-width: 481px) and (max-width: 768px) {
+			.chart {
+				--size: 50%;
+			}
+		}
+
+		.chart h3 {
+			margin: 0;
+			line-height: 1.75em;
+			min-height: 2em;
+		}
+
+		.chart>p {
+			margin-top: 0;
+		}
+	</style>
+</body>
+</html>

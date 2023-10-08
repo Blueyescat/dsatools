@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base href="/bpbin/">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Blueprint storing and sharing service for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Blueprint Bin - DSA Tools">
+	<meta property="og:description" content="Store and share blueprints with ease.">
+	<meta property="theme-color" content="#1f80b1">
+	<title>Blueprint Bin</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script type="module" src="/assets/sw-reg.js"></script>
+	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
+	<link type="text/css" rel="stylesheet" href="/main.css">
+</head>
+<body>
+	<header></header>
+	<div id="main-container">
+		<p>Blueprint storing and sharing service.</p>
+		<p><b>ALPHA VERSION ⚠️</b> All stored blueprints will be deleted once the app is out of alpha. Feedback is welcome.</p>
+		<h3>New Post</h3>
+		<form id="form-post">
+			<h4>Description</h4>
+			<p>
+				<textarea id="desc" rows="3" placeholder="Optional description"></textarea>
+			</p>
+			<h4>Blueprint String</h4>
+			<p>
+				<textarea id="bp-input" name="bp" rows="6" required minlength="3" placeholder="DSA:..."></textarea>
+			</p>
+			<p>
+				<input type="button" class="colored" id="button-submit" value="Create">
+				<span id="error"></span>
+			</p>
+		</form>
+		<footer></footer>
+	</div>
+	<script type="module">
+		const credits = `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>.`
+
+		import { loadHF } from "/main.js"
+		loadHF(credits)
+
+		const form = document.getElementById("form-post")
+		const submitButton = document.getElementById("button-submit")
+		const descInput = document.getElementById("desc")
+		const bpInput = document.getElementById("bp-input")
+		const error = document.getElementById("error")
+
+		const endpoint = "https://dsa.fr.to" + location.pathname
+
+		submitButton.addEventListener("click", async () => {
+			if (!form.reportValidity()) return
+
+			document.body.classList.add("processing")
+			const res = await fetch(endpoint + "/new", {
+				method: "POST",
+				redirect: "follow",
+				body: JSON.stringify({
+					desc: descInput.value,
+					str: bpInput.value
+				})
+			}).catch(console.error)
+			document.body.classList.remove("processing")
+
+			if (res == null)
+				return error.textContent = "Network error, check your connection."
+			if (res.status == 400)
+				return error.textContent = (await res.json()).error
+			if (!res.ok)
+				return error.textContent = "Unexpected error."
+
+			if (res.redirected)
+				window.location.href = res.url
+		})
+
+		bpInput.addEventListener("focus", () => bpInput.select())
+		bpInput.addEventListener("dblclick", () => bpInput.select())
+	</script>
+	<script type="module" src="/assets/goatc.js"></script>
+	<style>
+		html {
+			height: 100%;
+		}
+
+		body {
+			height: 100%;
+		}
+
+		body.processing,
+		body.processing * {
+			cursor: wait
+		}
+
+		#error {
+			color: #D8000C;
+		}
+
+		#desc {
+			width: 50%;
+		}
+
+		#bp-input {
+			width: 100%;
+			resize: vertical;
+			font-size: 0.85em;
+		}
+
+		#button-submit {
+			font-size: 1.1em;
+		}
+	</style>
+</body>
+</html>

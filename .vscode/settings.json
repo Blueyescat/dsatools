@@ -4,5 +4,6 @@
   "typescript.format.semicolons": "remove",
   "typescript.preferences.quoteStyle": "double",
   "html.format.extraLiners": "",
-  "html.format.wrapLineLength": 0
+  "html.format.wrapLineLength": 0,
+  "files.insertFinalNewline": true
 }

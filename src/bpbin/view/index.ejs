@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base href="/bpbin/view/">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Blueprint storing and sharing service for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Blueprint Bin - DSA Tools">
+	<meta property="og:description" content="<%= locals.desc ? locals.desc.substring(0, 1000) : `Blueprint not found.` %>">
+	<meta property="og:image" content="<%= locals.imgUrl ?? "" %>">
+	<meta property="theme-color" content="#1f80b1">
+	<title>Blueprint Bin</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script type="module" src="/assets/sw-reg.js"></script>
+	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
+	<link type="text/css" rel="stylesheet" href="/main.css">
+	<link type="text/css" rel="stylesheet" href="/lib/zoomist/css.css" />
+</head>
+<body>
+	<header></header>
+	<div id="main-container">
+		<p>Blueprint storing and sharing service. You can copy and share the URL of this page.</p>
+		<p><b>ALPHA VERSION ⚠️</b> All stored blueprints will be deleted once the app is out of alpha. Feedback is welcome.</p>
+		<p><a href="../"><b>« New Post</b></a></p>
+		<h3>Description</h3>
+		<p>
+		<div id="desc">
+			<% if (locals.str) { %>
+			<%= locals.desc ?? "-" %>
+			<% } else { %>
+			<i>Blueprint not found.</i>
+			<% } %>
+		</div>
+		</p>
+		<p>
+			<button id="button-copy" class="colored">Copy String</button>
+			<span class="tooltip-ref" data-allow-hover data-click-triggered>
+				<button>View String</button>
+				<span class="tooltip-space"></span>
+			</span>
+			<span class="tooltip-content" style="width: 100%">
+				<span>
+					<textarea id="bp" readonly spellcheck="false"><%= locals.str ?? "" %></textarea>
+				</span>
+			</span>
+		</p>
+		<h3>
+			Preview
+			<button id="button-reset-zoom">Reset Zoom</button>
+		</h3>
+		<div id="preview-container">
+			<div class="zoomist-container">
+				<div class="zoomist-wrapper">
+					<div class="zoomist-image">
+						<img id="preview-image" src="<%= locals.imgUrl ?? "" %>" width="100%">
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer></footer>
+	</div>
+	<style>
+		:root {
+			--page-width: 900px;
+		}
+
+		#bp {
+			width: 100%;
+			min-height: 110px;
+			max-height: 220px;
+			resize: vertical;
+			box-sizing: border-box;
+			overscroll-behavior: contain;
+		}
+
+		#bp-input {
+			font-size: 0.85em;
+		}
+
+		h3>button {
+			margin-left: 0.6em;
+		}
+
+		#preview-container {
+			text-align: center;
+			outline: 1px solid gray;
+			cursor: move;
+			margin: 0 2%;
+		}
+
+		#preview-container .zoomist-wrapper {
+			background-color: var(--container-color) !important;
+		}
+	</style>
+	<script type="module" src="./main.js"></script>
+</body>
+</html>

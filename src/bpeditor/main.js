@@ -1,14 +1,13 @@
 globalThis.toolPath = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))
-const tool = {
-	name: "Blueprint Editor",
-	credits: `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>.
-			Uses <a href='https://github.com/Blueyescat/dsabp-js' target='_blank'>dsabp-js</a>.`
-}
+const credits = `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>.
+	Uses <a href='https://github.com/Blueyescat/dsabp-js' target='_blank'>dsabp-js</a>.`
 
 const autoInputSave = import("/assets/autoInputSave.js")
-import { BuildCmd, Item, PREFIX, decode, encode } from "../assets/lib/dsabp-js/index.min.js"
+// eslint-disable-next-line
+import { Blueprint, BuildCmd, Item, PREFIX, decode, encode } from "dsabp-js"
 import * as operations from "./operations.js"
-import { addTooltip } from "/main.js"
+import { loadHF } from "/main.js"
+loadHF(credits)
 
 const inputBp = document.getElementById("bp-input")
 const opRadios = Array.from(document.getElementById("chips-operation").querySelectorAll("input"))
@@ -27,7 +26,7 @@ const inputRotateAngle = document.getElementById("input-rotate-angle")
 const noticeTimeoutIds = {},
 	searchParams = new URLSearchParams(window.location.search)
 
-/** @type {import("../assets/lib/dsabp-js/index.js").Blueprint} */
+/** @type {Blueprint} */
 let bp,
 	currentOp = "0",
 	inputBpTimer,
@@ -35,7 +34,7 @@ let bp,
 
 inputBp.addEventListener("input", function () {
 	this.style.height = 0
-	this.style.height = this.scrollHeight + "px"
+	this.style.height = this.scrollHeight + 2 + "px"
 	clearTimeout(inputBpTimer)
 	inputBpTimer = setTimeout(() => loadBlueprint(this.value.trim()), 300)
 })
@@ -158,7 +157,3 @@ function notice(target, color, text = "", temp) {
 		typeof temp == "number" ? temp : 8000
 	)
 }
-
-document.querySelectorAll(".tooltip-ref").forEach(addTooltip)
-document.querySelector("header nav .dropdown>.text").innerHTML = tool.name
-if (tool.credits) document.getElementById("credits").innerHTML = tool.name + " " + tool.credits

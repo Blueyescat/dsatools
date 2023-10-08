@@ -12,13 +12,11 @@
 	<meta property="theme-color" content="#1f80b1">
 	<title>Image to Pixel Art</title>
 	<link rel="manifest" href="/app.webmanifest">
-	<script src="/assets/sw-reg.js"></script>
+	<script type="module" src="/assets/sw-reg.js"></script>
 	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
 	<link type="text/css" rel="stylesheet" href="/main.css">
-	<link type="text/css" rel="stylesheet" href="./main.css">
-	<link type="text/css" rel="stylesheet" href="/assets/lib/zoomist/zoomist.min.css" />
-	<script src="/assets/lib/pica/pica.min.js"></script>
-	<script src="/assets/lib/zoomist/zoomist.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<link type="text/css" rel="stylesheet" href="/lib/zoomist/css.css" />
 </head>
 <body>
 	<header></header>
@@ -116,19 +114,25 @@
 				</p>
 			</div>
 		</div>
-		<button id="button-process">Process</button>
+		<button class="colored" id="button-process">Process</button>
 		<h3 id="result-heading">Result <small id="result-info" style="font-weight: normal"></small></h3>
 		<small>Use mouse buttons to move and zoom. Click a square to view its coords. <b>Right click the image to Save, Copy etc.</b></small>
 		<button id="button-reset-zoom">Reset Zoom</button>
 		<button id="button-show-resized" style="display: none;">Show Resized Image</button>
 		<p id="notice"></p>
 		<div id="result-container">
-			<div id="result" data-zoomist-src=""></div>
+			<div class="zoomist-container">
+				<div class="zoomist-wrapper">
+					<div class="zoomist-image">
+						<img id="result">
+					</div>
+				</div>
+			</div>
 			<div id="result-hover-square" style="display: none;"><span class="coords"></span></div>
 		</div>
 		<footer></footer>
 	</div>
-	<script type="module" src="./main.js"></script>
-	<script defer src="/assets/goatc.min.js"></script>
+	<script type="module" src="main.js"></script>
+	<script type="module" src="/assets/goatc.js"></script>
 </body>
 </html>

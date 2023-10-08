@@ -1,21 +1,24 @@
-// changing this file makes a browser update the active SW, and changing cacheName makes it re-cache all files
-const cacheName = "dsatools-v2"
+// changing this file makes the browser update the active SW, and changing cacheName makes it re-cache all files
+const cacheName = "dsatools-v1"
 
-const cacheUrls = ["/", ..."items/ main.css main.js app.webmanifest https://x.dsatools.workers.dev?https://pub.drednot.io/test/econ/item_schema.json".split(" ")]
+// TODO: Automate cacheUrls
 
-for (const p of ("sw-reg.js goatc.min.js icomoon.woff header.html"
+const cacheUrls = ["/", ...("items/ bpbin/ main.css main.js app.webmanifest lib/pica.js lib/zoomist.js lib/zoomist/css.css lib/dsabp-js.js"
+	+ " https://x.dsatools.workers.dev?https://pub.drednot.io/test/econ/item_schema.json").split(" ")]
+
+for (const p of ("sw-reg.js goatc.js icomoon.woff header.html"
 	+ " footer.html icons/64.webp icons/80m.webp icons/96.webp icons/144.webp icons/512.png"
-	+ " autoInputSave.js lib/pica/pica.min.js lib/zoomist/zoomist.min.js lib/zoomist/zoomist.min.css"
-	+ " lib/dsabp-js/index.min.js").split(" "))
+	+ " autoInputSave.js").split(" "))
 	cacheUrls.push("assets/" + p)
 
-for (const p of " main.css main.js converter.js worker.js assets/bg_ship.png assets/color-palettes.json".split(" "))
+for (const p of (" main.css main.js converter.js worker.js assets/bg_ship.png assets/color-palettes.json").split(" "))
 	cacheUrls.push("img2pixar/" + p)
 
-for (const p of " main.css main.js operations.js assets/items.js".split(" "))
+for (const p of (" main.css main.js operations.js").split(" "))
 	cacheUrls.push("bpeditor/" + p)
 
-const fetchFirstList = /\/item_schema.json/
+const fetchFirstList = new RegExp(`/item_schema\\.json$|${location.origin}/($|bpbin/\\w*)`)
+const noCacheList = /\/bpbin\/\w+/
 
 self.addEventListener("install", e => {
 	e.waitUntil(
@@ -41,7 +44,8 @@ self.addEventListener("fetch", e => {
 				if (cacheRes) return cacheRes
 			}
 			return fetch(e.request).then(res => {
-				cache.put(e.request.url.split("?")[0], res.clone()) // firefox caches with params
+				if (!noCacheList.test(e.request.url))
+					cache.put(e.request.url.split("?")[0], res.clone()) // firefox caches with params
 				return res
 			}).catch(async () => {
 				if (fetchFirst) {

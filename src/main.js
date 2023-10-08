@@ -11,6 +11,19 @@ if (elFooter) await fetch("/assets/footer.html").then(res => res.text()).then(ht
 	elFooter.insertAdjacentHTML("beforeend", html)
 }).catch(console.error)
 
+export function loadHF(credits) {
+	const dd = document.querySelector("header nav .dropdown")
+	dd.getElementsByClassName("text")[0].innerHTML = location.pathname == "/" ? "Tools" : document.title
+	dd.querySelectorAll(".content>a").forEach(el => {
+		if (el.textContent == document.title) {
+			el.classList.add("active")
+			return
+		}
+	})
+	if (credits)
+		document.getElementById("credits").innerHTML = document.title + " " + credits
+}
+
 document.querySelectorAll(".custom-file-input").forEach(el => {
 	const input = el.querySelector("input")
 	el.querySelector("button").addEventListener("click", () => input.click())
@@ -43,13 +56,18 @@ window.addEventListener("focusin", e => {
 })
 
 /* Tooltips */
-export function addTooltip(el) {
-	el.addEventListener(usesTouch ? "touchend" : "mouseenter", tooltipInteractionHandler, true)
+export function addTooltip(ref) {
+	const clickTriggered = "clickTriggered" in ref.dataset
+	ref.addEventListener(usesTouch ? "touchend" : (clickTriggered ? "click" : "mouseenter"), tooltipInteractionHandler, true)
 }
 
+document.querySelectorAll(".tooltip-ref").forEach(addTooltip)
+
+let ttpCloseHandler
 function tooltipInteractionHandler() {
 	const ref = this
 	let space
+	const clickTriggered = "clickTriggered" in ref.dataset
 	const allowHover = "allowHover" in ref.dataset
 	const showAbove = "showAbove" in ref.dataset
 	if (allowHover) {
@@ -57,7 +75,7 @@ function tooltipInteractionHandler() {
 		if (space) space.style.display = "block"
 	}
 	const content = ref.nextElementSibling
-	if (usesTouch && content.style.display == "block")
+	if ((usesTouch || clickTriggered) && content.style.display == "block")
 		return closeTooltip(content, space)
 	if (content.style.display == "block")
 		return
@@ -80,31 +98,37 @@ function tooltipInteractionHandler() {
 	}, { once: true })
 
 	if (usesTouch) {
-		window.addEventListener("touchend", function closeHandler(e) {
+		ttpCloseHandler = function (e) {
 			if (e.target != ref && !content.contains(e.target)) {
 				closeTooltip(content, space)
-				window.removeEventListener("touchend", closeHandler)
+				window.removeEventListener("touchend", ttpCloseHandler)
 			}
-		})
+		}
+		window.addEventListener("touchend", ttpCloseHandler)
 	} else {
-		ref.addEventListener("mouseleave", function closeHandler(e) {
+		ttpCloseHandler = function (e) {
+			if (e.relatedTarget?.parentElement == ref)
+				return ref.addEventListener("mouseleave", ttpCloseHandler, { once: true })
 			if (e.relatedTarget == space)
-				return space.addEventListener("mouseleave", closeHandler, { once: true })
+				return space.addEventListener("mouseleave", ttpCloseHandler, { once: true })
 			if (!allowHover || (allowHover && !content.contains(e.relatedTarget))) {
-				if (elementContainsSelection(content)) // keep open if user selected text in content
+				if (elementContainsSelection(content)) { // keep open if user selected text in content
+					content.addEventListener("mouseleave", ttpCloseHandler, { once: true })
 					window.addEventListener("click", e => {
 						if (!content.contains(e.target))
 							closeTooltip(content, space)
 					}, { once: true })
-				else
+				} else
 					closeTooltip(content, space)
 			} else {
-				content.addEventListener("mouseleave", closeHandler, { once: true })
+				content.addEventListener("mouseleave", ttpCloseHandler, { once: true })
 			}
-		}, { once: true })
+		}
+		ref.addEventListener("mouseleave", ttpCloseHandler, { once: true })
 	}
 
 	function closeTooltip(content, space) {
+		ref.removeEventListener(usesTouch ? "touchend" : "mouseleave", ttpCloseHandler)
 		content.style.display = ""
 		if (space) space.style.display = ""
 	}

@@ -12,10 +12,10 @@
 	<meta property="theme-color" content="#1f80b1">
 	<title>Blueprint Editor</title>
 	<link rel="manifest" href="/app.webmanifest">
-	<script src="/assets/sw-reg.js"></script>
+	<script type="module" src="/assets/sw-reg.js"></script>
 	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
 	<link type="text/css" rel="stylesheet" href="/main.css">
-	<link type="text/css" rel="stylesheet" href="./main.css">
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
 	<header></header>
@@ -82,10 +82,12 @@
 			<div data-op="replace">
 				<p>
 					Items to find: <input id="input-replace-search" data-save placeholder="iron block, fabricator,comms, 236..."></input>
-					<br><small>
+				</p>
+				<p>
+					<small>
 						Separate items with commas. See
-						<span class="tooltip-ref" data-allow-hover>
-							<a href="#">Item List</a>.
+						<span class="tooltip-ref" data-allow-hover data-click-triggered>
+							<a class="no-link">Item List</a>.
 							<span class="tooltip-space"></span>
 						</span>
 						<span class="tooltip-content">
@@ -97,8 +99,7 @@
 					</small>
 				</p>
 				<p>
-					Replace with: <input id="input-replace-replacement" data-save></input>
-					<small style="display: inline-block;">(empty = delete)</small>
+					Replace with: <input id="input-replace-replacement" data-save></input> <small style="display: inline-block;">(empty = delete)</small>
 				</p>
 				<details>
 					<summary>Notes</summary>
@@ -109,7 +110,7 @@
 				</details>
 			</div>
 		</div>
-		<button id="button-process">Process</button>
+		<button class="colored" id="button-process">Process</button>
 		<label><small>Auto Copy: <input id="cb-auto-copy" type="checkbox" data-save> <span id="notice-copy"></span></small></label>
 		<h3 id="result-heading">
 			Result
@@ -122,7 +123,7 @@
 		</div>
 		<footer></footer>
 	</div>
-	<script type="module" src="./main.js"></script>
-	<script defer src="/assets/goatc.min.js"></script>
+	<script type="module" src="main.js"></script>
+	<script type="module" src="/assets/goatc.js"></script>
 </body>
 </html>

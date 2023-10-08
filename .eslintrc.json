@@ -4,15 +4,29 @@
     "browser": true,
     "worker": true
   },
-  "extends": "eslint:recommended",
+  "extends": [ "eslint:recommended", "plugin:@typescript-eslint/recommended" ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [ "@typescript-eslint" ],
   "parserOptions": {
     "ecmaVersion": 2022,
     "sourceType": "module"
   },
   "rules": {
     "indent": [ "error", "tab", { "SwitchCase": 1 } ],
-    "quotes": [ "error", "double" ],
+    "quotes": [ "error", "double", { "allowTemplateLiterals": true } ],
     "semi": [ "error", "never" ],
-    "prefer-const": "warn"
-  }
+    "prefer-const": "warn",
+    "@typescript-eslint/no-this-alias": "off"
+  },
+  "overrides": [
+    {
+      "files": [ "*.*" ],
+      "excludedFiles": [ "dist/**", "src/**" ],
+      "env": {
+        "node": true,
+        "browser": false,
+        "worker": false
+      }
+    }
+  ]
 }

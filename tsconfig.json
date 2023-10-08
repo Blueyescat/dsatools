@@ -1,0 +1,19 @@
+{
+  "include": [ "./src/" ],
+  "compilerOptions": {
+    "paths": {
+      "/*": [
+        "./src/*"
+      ]
+    },
+    "allowJs": true,
+    "module": "es2022",
+    "moduleResolution": "node",
+    "target": "es2022",
+    "lib": [ "es2022", "DOM", "WebWorker" ],
+    "outDir": "./dist/",
+    "declaration": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+  }
+}

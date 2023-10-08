@@ -1,5 +1,5 @@
-// eslint-disable-next-line no-unused-vars
-import { Blueprint, BuildBits, BuildCmd, ConfigCmd, Item, LoaderPoint, Shape } from "../assets/lib/dsabp-js/index.min.js"
+// eslint-disable-next-line
+import { Blueprint, BuildBits, BuildCmd, ConfigCmd, Item, LoaderPoint, Shape } from "dsabp-js"
 
 const shapeFlipMap = {
 	H: new Map([
@@ -203,7 +203,7 @@ export function rotate(bp, angle) {
 }
 
 function toFixed(n, digits = 10) {
-	const f = 10 ** digits 
+	const f = 10 ** digits
 	return Math.round(n * f) / f
 }
 

@@ -1,14 +1,14 @@
 globalThis.toolPath = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))
-const tool = {
-	name: "Image to Pixel Art",
-	credits: `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>,
-			<br>Inspired by <a href='https://github.com/ivstiv/pixelart-converter' target='_blank'>pixelart-converter</a> by ivstiv.`
-}
+const credits = `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>,
+	<br>Inspired by <a href='https://github.com/ivstiv/pixelart-converter' target='_blank'>pixelart-converter</a> by ivstiv.`
 
 import("/assets/autoInputSave.js")
-import { usesTouch, addTooltip } from "/main.js"
+import Pica from "pica"
+import Zoomist from "zoomist"
+import { loadHF, usesTouch } from "/main.js"
+loadHF(credits)
 
-const Pica = new window.pica({ idle: 60000 })
+const pica = new Pica({ idle: 60000 })
 
 let worker
 if ("OffscreenCanvas" in window) worker = new Worker(globalThis.toolPath + "/worker.js")
@@ -33,7 +33,7 @@ const imgFilePreview = document.querySelector("#preview>img")
 const elFilePreviewName = document.querySelector("#preview>.name")
 const elFilePreviewSize = document.querySelector("#preview>.size")
 const elResultContainer = document.getElementById("result-container")
-const elResult = document.getElementById("result")
+const imgResult = document.getElementById("result")
 const elNotice = document.getElementById("notice")
 const elResultInfo = document.getElementById("result-info")
 const elResultHeading = document.getElementById("result-heading")
@@ -177,7 +177,7 @@ buttonProcess.addEventListener("click", async () => {
 			if (!image.complete) await new Promise(resolve => image.onload = () => resolve())
 			canvasCtx.drawImage(image, 0, 0, canvas.width, canvas.height)
 		} else {
-			await Pica.resize(image, canvas, cbNoSmoothResizing.checked ? { filter: "box" } : undefined)
+			await pica.resize(image, canvas, cbNoSmoothResizing.checked ? { filter: "box" } : undefined)
 			canvas.toBlob(blob => resizeCache[cacheKey] = resizedImageBlob = blob)
 		}
 		buttonShowResized.style.display = ""
@@ -199,15 +199,17 @@ buttonProcess.addEventListener("click", async () => {
 	canvas.width = displayWidth = imageData.width
 	canvas.height = displayHeight = imageData.height
 	canvasCtx.putImageData(imageData, 0, 0)
-	elResult.dataset.zoomistSrc = URL.createObjectURL(await new Promise(resolve => canvas.toBlob(resolve)))
+	imgResult.src = URL.createObjectURL(await new Promise(resolve => canvas.toBlob(resolve)))
 	if (resultZoomist) resultZoomist.destroy()
 	elResultSquare.style.display = "none"
-	resultZoomist = new window.Zoomist(elResult, {
-		fill: "contain",
+	resultZoomist = new Zoomist(".zoomist-container", {
+		bounds: false,
 		zoomRatio: 0.3,
+		initScale: 1,
+		minScale: 0.03,
+		maxScale: 100,
 		on: {
-			zoom(ratio) {
-				if (ratio == 0.01) this.zoomTo(0.02) // can't zoom out if 0.01
+			zoom() {
 				elResultSquare.style.display = "none"
 			},
 			dragStart() {
@@ -220,10 +222,9 @@ buttonProcess.addEventListener("click", async () => {
 				setTimeout(() => resultDragging = false, 0)
 			},
 			ready() {
-				elResultHeading.scrollIntoView({ behavior: "smooth" })
-				const img = elResult.getElementsByClassName("zoomist-image")[0]
-				img.style.pointerEvents = "unset" // zoomist makes it none, which is bad
-				img.draggable = false // alternative for ^
+				setTimeout(() => elResultHeading.scrollIntoView({ behavior: "smooth" }), 100)
+				imgResult.style.pointerEvents = "auto"
+				imgResult.draggable = false
 			}
 		}
 	})
@@ -242,20 +243,18 @@ async function process(data) {
 	return result
 }
 
-elResult.addEventListener(usesTouch ? "touchend" : "click", e => {
+imgResult.addEventListener(usesTouch ? "touchend" : "click", e => {
 	const thing = e.changedTouches?.item(0) ?? e
-	const target = thing.target
-	if (!target.classList.contains("zoomist-image") || resultDragging)
+	if (resultDragging)
 		return
 	const clientX = thing.clientX
 	const clientY = thing.clientY
 	// calculate coords of the hovered on paint pixel on the image (relative to zoom)
-	const img = target
-	const imgRect = img.getBoundingClientRect()
+	const imgRect = imgResult.getBoundingClientRect()
 	const x = clientX - imgRect.left
 	const y = clientY - imgRect.top
-	const resizeRatio = Math.min(img.width / displayWidth, img.height / displayHeight)
-	const scaledPixelSize = displayPixelSize * resizeRatio
+	const displayRatio = Math.min(imgResult.width / displayWidth, imgResult.height / displayHeight)
+	const scaledPixelSize = displayPixelSize * resultZoomist.transform.scale * displayRatio
 	const paintX = Math.floor(x / scaledPixelSize)
 	const paintY = Math.floor(y / scaledPixelSize)
 	if (paintX < 0 || paintY < 0)
@@ -338,7 +337,3 @@ function notice(text = "") {
 	if (text == "") return
 	noticeTimeoutId = setTimeout(() => elNotice.textContent = "", 8000)
 }
-
-document.querySelectorAll(".tooltip-ref").forEach(addTooltip)
-document.querySelector("header nav .dropdown>.text").innerHTML = tool.name
-if (tool.credits) document.getElementById("credits").innerHTML = tool.name + " " + tool.credits

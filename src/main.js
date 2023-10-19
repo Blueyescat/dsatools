@@ -169,6 +169,8 @@ if (!CSS.supports("selector(:has(*))")) {
 /* Link range-number inputs */
 document.querySelectorAll("[range-link-number]").forEach(rangeInput => {
 	const numberInput = rangeInput.nextElementSibling
+	if (numberInput.value == "")
+		numberInput.value = rangeInput.value
 	rangeInput.addEventListener("input", () => {
 		numberInput.value = rangeInput.value
 		numberInput.dispatchEvent(new Event("change"))

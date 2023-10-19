@@ -1,5 +1,5 @@
 // changing this file makes the browser update the active SW, and changing cacheName makes it re-cache all files
-const cacheName = "dsatools-v1"
+const cacheName = "dsatools-v2"
 
 // TODO: Automate cacheUrls
 

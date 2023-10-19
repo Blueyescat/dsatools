@@ -50,13 +50,11 @@
 		const bpInput = document.getElementById("bp-input")
 		const error = document.getElementById("error")
 
-		const endpoint = "https://dsa.fr.to" + location.pathname
-
 		submitButton.addEventListener("click", async () => {
 			if (!form.reportValidity()) return
 
 			document.body.classList.add("processing")
-			const res = await fetch(endpoint + "/new", {
+			const res = await fetch(location.href + "/new", {
 				method: "POST",
 				redirect: "follow",
 				body: JSON.stringify({

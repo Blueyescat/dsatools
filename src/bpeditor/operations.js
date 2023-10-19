@@ -251,7 +251,7 @@ export function replace(bp, options) {
 				if (!replacementItem.isBuildable)
 					cmd.shape = undefined
 			}
-			++amount
+			amount += cmd.bits ? cmd.bits.toArray().filter(bit => bit).length : 1
 		}
 	}
 

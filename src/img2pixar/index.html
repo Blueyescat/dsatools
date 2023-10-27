@@ -20,115 +20,117 @@
 </head>
 <body>
 	<header></header>
-	<div id="main-container">
-		<small>Create an in-game pixel art from an image by finding closest paint colors for each pixel in the image.</small>
-		<h3>Base Image</h3>
-		<p>
-			<span class="custom-file-input">
-				<input id="input-file" type="file" accept="image/*" style="display: none;">
-				<button>Select File</button>
-			</span>
-			<small>You can also paste or drag & drop an image into the page.</small>
-			<span class="tooltip-ref help-circle" data-allow-hover>
-				<span class="text">?</span>
-				<span class="tooltip-space"></span>
-			</span>
-			<span class="tooltip-content">
-				Rather than saving an image just to use here, you can just copy it and paste (CTRL+V) here.
-				<br><br>This tool works completely offline, the image won't be uploaded.
-			</span>
-		</p>
-		<div id="preview" class="file-preview">
-			<img>
-			<small class="name"></small> <small class="size"></small>
-		</div>
-		<h3>Options</h3>
-		<div class="columns" style="max-width: 800px; margin-top: -10px;">
-			<div>
-				<p>
-					No Smooth Resizing: <input id="cb-no-smooth-resizing" type="checkbox" autocomplete="off">
-					<span class="tooltip-ref help-circle" data-allow-hover>
-						<span class="text">?</span>
-						<span class="tooltip-space"></span>
-					</span>
-					<span class="tooltip-content">
-						Disables smooth resizing. May give better results in some cases like using a pixel art image.
-						<br><br>If using a pixel art image, it should only contain the art (no space around)
-						and the size options should be set to the size of the pixel art in the image.
-					</span>
-				</p>
-				<p>
-					Pixel Art Size:
-					<i class="i arrows-l-r"></i><input id="input-width" type="number" min="1" step="any" placeholder="--" autocomplete="off">
-					<i class="i x" style="font-size: 0.78rem; vertical-align: middle;"></i>
-					<input id="input-height" type="number" min="1" step="any" pattern="\d*" placeholder="--" autocomplete="off"><i class="i arrows-u-d"></i>
-					<span class="tooltip-ref help-circle" data-allow-hover>
-						<span class="text">?</span>
-						<span class="tooltip-space"></span>
-					</span>
-					<span class="tooltip-content">
-						The pixel art size in the game. For a max size ship, it is 78x78 excluding hull.
-						The image will be resized to match this size.
-					</span>
-				</p>
-				<p style="margin-top: -0.5em;">
-					<span class="line-up-right" style="margin-top: 5px;"></span>
-					Use Turret Scale: <input id="cb-use-turret-scale" type="checkbox" data-save>
-					<span class="tooltip-ref help-circle" data-allow-hover>
-						<span class="text">?</span>
-						<span class="tooltip-space"></span>
-					</span>
-					<span class="tooltip-content">
-						If enabled: 1 equals to 3 squares,
-						<br>0.3 equals to 1 square.
-						<br>e.g. 7x7.6 = 21x23
-					</span>
-				</p>
-				<p>Color Space:
-					<select id="select-color-space" data-save>
-						<option value="CIE2000">CIE2000</option>
-						<option value="RGB">RGB</option>
-					</select>
-				</p>
-				<p>Paint ID Font Size: <input id="input-font-size" type="number" min="1" value="12" data-save></p>
+	<div id="main-container" class="grid">
+		<div class="card">
+			<p class="smaller">Create an in-game pixel art from an image by finding closest paint colors for each pixel in the image.</p>
+			<h3>Base Image</h3>
+			<p>
+				<span class="custom-file-input">
+					<input id="input-file" type="file" accept="image/*" style="display: none;">
+					<button>Select File</button>
+				</span>
+				<small>You can also paste or drag & drop an image into the page.</small>
+				<span class="tooltip-ref help-circle" data-allow-hover>
+					<span class="text">?</span>
+					<span class="tooltip-space"></span>
+				</span>
+				<span class="tooltip-content">
+					Rather than saving an image just to use here, you can just copy it and paste (CTRL+V) here.
+					<br><br>This tool works completely offline, the image won't be uploaded.
+				</span>
+			</p>
+			<div id="preview" class="file-preview">
+				<img>
+				<small class="name"></small> <small class="size"></small>
 			</div>
-			<div>
-				<p>Draw Paint Id: <input id="cb-paint-id" type="checkbox" checked autocomplete="off"></p>
-				<p>Draw Paint Texture: <input id="cb-paint-texture" type="checkbox" data-save></p>
-				<p>Pixel Size: <input id="input-pixel-size" type="number" min="1" value="22" data-save></p>
-				<p>In-ship Coords:
-					<span class="no-select">
-						x<input id="input-coord-x" type="number" min="0" value="1" placeholder="--" autocomplete="off">,
-						y<input id="input-coord-y" type="number" min="0" value="1" placeholder="--" autocomplete="off">
-					</span>
-					<span class="tooltip-ref help-circle" data-allow-hover>
-						<span class="text">?</span>
-						<span class="tooltip-space"></span>
-					</span>
-					<span id="debug-key-info" class="tooltip-content">
-						Coordinates of the bottom left square of the pixel art in game.
-						You can check coordinates by holding the <i>debug key</i> in a ship.
-						<br><br>This is used to show coords of a square in the result image (click a square).
-						Which helps you make sure you paint the correct squares in the ship.<br><br>
-					</span>
-				</p>
-			</div>
-		</div>
-		<button class="colored" id="button-process">Process</button>
-		<h3 id="result-heading">Result <small id="result-info" style="font-weight: normal"></small></h3>
-		<small>Use mouse buttons to move and zoom. Click a square to view its coords. <b>Right click the image to Save, Copy etc.</b></small>
-		<button id="button-reset-zoom">Reset Zoom</button>
-		<button id="button-show-resized" style="display: none;">Show Resized Image</button>
-		<p id="notice"></p>
-		<div id="result-container">
-			<div class="zoomist-container">
-				<div class="zoomist-wrapper">
-					<div class="zoomist-image">
-						<img id="result">
-					</div>
+			<h3>Options</h3>
+			<div class="two-columns" style="column-gap: 3rem;">
+				<div>
+					<p>
+						No Smooth Resizing: <input id="cb-no-smooth-resizing" type="checkbox" autocomplete="off">
+						<span class="tooltip-ref help-circle" data-allow-hover>
+							<span class="text">?</span>
+							<span class="tooltip-space"></span>
+						</span>
+						<span class="tooltip-content">
+							Disables smooth resizing. May give better results in some cases like using a pixel art image.
+							<br><br>If using a pixel art image, it should only contain the art (no space around)
+							and the size options should be set to the size of the pixel art in the image.
+						</span>
+					</p>
+					<p>
+						Pixel Art Size:
+						<i class="i arrows-l-r"></i><input id="input-width" type="number" min="1" step="any" placeholder="--" autocomplete="off">
+						<i class="i x" style="font-size: 0.78rem; vertical-align: middle;"></i>
+						<input id="input-height" type="number" min="1" step="any" pattern="\d*" placeholder="--" autocomplete="off"><i class="i arrows-u-d"></i>
+						<span class="tooltip-ref help-circle" data-allow-hover>
+							<span class="text">?</span>
+							<span class="tooltip-space"></span>
+						</span>
+						<span class="tooltip-content">
+							The pixel art size in the game. For a max size ship, it is 78x78 excluding hull.
+							The image will be resized to match this size.
+						</span>
+					</p>
+					<p style="margin-top: -0.5em;">
+						<span class="line-up-right" style="margin-top: 5px;"></span>
+						Use Turret Scale: <input id="cb-use-turret-scale" type="checkbox" data-save>
+						<span class="tooltip-ref help-circle" data-allow-hover>
+							<span class="text">?</span>
+							<span class="tooltip-space"></span>
+						</span>
+						<span class="tooltip-content">
+							If enabled: 1 equals to 3 squares,
+							<br>0.3 equals to 1 square.
+							<br>e.g. 7x7.6 = 21x23
+						</span>
+					</p>
+					<p>Color Space:
+						<select id="select-color-space" data-save>
+							<option value="CIE2000">CIE2000</option>
+							<option value="RGB">RGB</option>
+						</select>
+					</p>
+					<p>Paint ID Font Size: <input id="input-font-size" type="number" min="1" value="12" data-save></p>
+				</div>
+				<div>
+					<p>Draw Paint Id: <input id="cb-paint-id" type="checkbox" checked autocomplete="off"></p>
+					<p>Draw Paint Texture: <input id="cb-paint-texture" type="checkbox" data-save></p>
+					<p>Pixel Size: <input id="input-pixel-size" type="number" min="1" value="22" data-save></p>
+					<p>In-ship Coords:
+						<span class="no-select">
+							x<input id="input-coord-x" type="number" min="0" value="1" placeholder="--" autocomplete="off">,
+							y<input id="input-coord-y" type="number" min="0" value="1" placeholder="--" autocomplete="off">
+						</span>
+						<span class="tooltip-ref help-circle" data-allow-hover>
+							<span class="text">?</span>
+							<span class="tooltip-space"></span>
+						</span>
+						<span id="debug-key-info" class="tooltip-content">
+							Coordinates of the bottom left square of the pixel art in game.
+							You can check coordinates by holding the <i>debug key</i> in a ship.
+							<br><br>This is used to show coords of a square in the result image (click a square).
+							Which helps you make sure you paint the correct squares in the ship.<br><br>
+						</span>
+					</p>
 				</div>
 			</div>
-			<div id="result-hover-square" style="display: none;"><span class="coords"></span></div>
+			<button id="button-process">Process</button>
+			<h3 id="result-heading">Result <small id="result-info" style="font-weight: normal"></small></h3>
+			<small>Use the mouse buttons to move and zoom the image, and right-click to save, copy etc. Click a square to view its coords.</small>
+			<button id="button-reset-zoom">Reset Zoom</button>
+			<button id="button-show-resized" style="display: none;">Show Resized Image</button>
+			<p id="notice"></p>
+			<div id="result-container">
+				<div class="zoomist-container">
+					<div class="zoomist-wrapper">
+						<div class="zoomist-image">
+							<img id="result">
+						</div>
+					</div>
+				</div>
+				<div id="result-hover-square" style="display: none;"><span class="coords"></span></div>
+			</div>
 		</div>
 		<footer></footer>
 	</div>

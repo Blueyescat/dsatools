@@ -41,7 +41,7 @@ input[type="number"] {
 #button-process {
 	margin: 15px 0;
 	font-size: 1.05em;
-	padding: 7px;
+	line-height: 1.7em;
 }
 
 h3>button {

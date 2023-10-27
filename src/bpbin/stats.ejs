@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base href="/bpbin/">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Statistics for Blueprint Bin.">
+	<meta name="twitter:card" content="summary">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Blueprint Bin Stats - DSA Tools">
+	<meta property="og:description" content="Statistics for Blueprint Bin.">
+	<meta property="theme-color" content="#1f80b1">
+	<title>Stats - Blueprint Bin</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script type="module" src="/assets/sw-reg.js"></script>
+	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
+	<link type="text/css" rel="stylesheet" href="/main.css">
+</head>
+<body>
+	<header></header>
+	<div id="main-container" class="grid">
+		<div class="card">
+			<p><a href="./"><b>New Post</b></a></p>
+		</div>
+		<div class="card">
+			<h2>Statistics</h2>
+			<div class="two-columns" style="row-gap: 0;">
+				<div>
+					<ul>
+						<li>Live for: <b><%= liveTime[0] %> days and <%= liveTime[1] %> hours</b></li>
+						<li>Blueprints stored: <b><%= count %></b></li>
+						<li>Size of the strings: <b><%= (bytesStr / 1024).toFixed(3) %> KB</b></li>
+						<li>Size of the titles and descriptions: <b><%= (bytesDesc / 1024).toFixed(3) %> KB</b></li>
+						<li>Size of the preview images: <b><%= (bytesImg / (1024 * 1024)).toFixed(1) %> MB</b></li>
+						<li>Time spent generating the current previews: <b><%= renderTime[0] %> hours and <%= renderTime[1].toFixed(3) %> seconds</b></li>
+						<li>Blueprint views: <b><%= views %></b></li>
+						<li>Blueprint commands: <b><%= cmdsBuild %> build</b> and <b><%= cmdsConfig %> config</b></li>
+					</ul>
+				</div>
+				<div>
+					<ul>
+						<li>Blueprint contents: <b><%= itemsTotal %></b></li>
+						<ul>
+							<% for (const item of items) { -%>
+							<li><img src="https://test.drednot.io/img/item/<%= item.img %>.png" loading="lazy"> <%= item.name %>: <b><%= item.amount %></b></li><%
+							} %>
+						</ul>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<footer></footer>
+	</div>
+	<style>
+		img {
+			vertical-align: middle;
+			width: 1.4em;
+			height: 1.4em;
+		}
+
+		ul {
+			margin-top: 0;
+		}
+	</style>
+	<script type="module">
+		const credits = `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>.`
+
+		import {
+			loadHF
+		} from "/main.js"
+		loadHF(credits, "Blueprint Bin")
+	</script>
+</body>
+</html>

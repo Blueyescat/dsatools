@@ -1,0 +1,71 @@
+#bp {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+}
+
+#title {
+    word-wrap: break-word;
+}
+
+#buttons {
+    display: flex;
+    gap: 1em;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#buttons button {
+    width: 100%;
+    padding: 0.8em 0.5em;
+}
+
+#desc-card {
+    overflow-y: auto;
+}
+
+#preview-card h3>button {
+    margin-left: 0.6em;
+}
+
+#preview-card {
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+}
+
+#preview-container {
+    text-align: center;
+    cursor: move;
+    margin-bottom: 0.9em;
+}
+
+@media (max-width: 768px) {
+    #preview-container {
+        width: 65%;
+    }
+
+    #buttons {
+        flex-direction: row;
+        justify-content: unset;
+    }
+}
+
+#preview-container .zoomist-wrapper {
+    background-color: var(--container-color) !important;
+    box-shadow: inset 0px 0px 16px 0px rgba(0, 0, 0, 0.3);
+}
+
+#preview-image {
+    max-width: 100%;
+    opacity: 0;
+    transition: opacity 100ms;
+}
+
+#items img {
+    width: 1.4em;
+    height: 1.4em;
+    vertical-align: middle;
+}

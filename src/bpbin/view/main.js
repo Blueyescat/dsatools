@@ -7,6 +7,9 @@ loadHF(credits)
 const viewBp = document.getElementById("bp")
 const buttonCopy = document.getElementById("button-copy")
 const imgPreview = document.getElementById("preview-image")
+const postDate = document.getElementById("post-date")
+
+postDate.textContent = new Date(parseInt(postDate.dataset.unix)).toLocaleString()
 
 let copyButtonTimer
 buttonCopy.addEventListener("click", () => {
@@ -36,6 +39,7 @@ function imageReady() {
 		on: {
 			ready() {
 				imgPreview.style.pointerEvents = "auto"
+				imgPreview.style.opacity = "1"
 				imgPreview.draggable = false
 			}
 		}

@@ -10,7 +10,7 @@
 	<meta property="og:title" content="Blueprint Bin - DSA Tools">
 	<meta property="og:description" content="Store and share blueprints with ease.">
 	<meta property="theme-color" content="#1f80b1">
-	<title>Blueprint Bin</title>
+	<title>New - Blueprint Bin</title>
 	<link rel="manifest" href="/app.webmanifest">
 	<script type="module" src="/assets/sw-reg.js"></script>
 	<link rel="icon" type="image/png" href="/assets/icons/64.webp">
@@ -18,46 +18,71 @@
 </head>
 <body>
 	<header></header>
-	<div id="main-container">
-		<p>Blueprint storing and sharing service.</p>
-		<p><b>ALPHA VERSION ⚠️</b> All stored blueprints will be deleted once the app is out of alpha. Feedback is welcome.</p>
-		<h3>New Post</h3>
-		<form id="form-post">
-			<h4>Description</h4>
-			<p>
-				<textarea id="desc" rows="3" placeholder="Optional description"></textarea>
-			</p>
-			<h4>Blueprint String</h4>
-			<p>
-				<textarea id="bp-input" name="bp" rows="6" required minlength="3" placeholder="DSA:..." spellcheck="false"></textarea>
-			</p>
-			<p>
-				<input type="button" class="colored" id="button-submit" value="Create">
-				<span id="error"></span>
-			</p>
-		</form>
+	<div id="main-container" class="grid">
+		<div class="card">
+			<p><a href="./stats"><b>Statistics</b></a></p>
+			<hr>
+			<p class="smaller">Blueprint storing and sharing service.</p>
+			<p class="smaller">ALPHA VERSION ⚠️ All stored blueprints will be deleted once the app is out of alpha. Feedback is welcome.</p>
+		</div>
+		<div class="card">
+			<h2>New Post</h2>
+			<p>Post a blueprint to share with others.</p>
+			<form id="form-post">
+				<h4>Title</h4>
+				<p class="smaller">Please avoid including width/height here, it will be displayed by the app.</p>
+				<p>
+					<input id="title" maxlength="128" placeholder="Short and descriptive title">
+				</p>
+				<h4>Description</h4>
+				<p class="smaller">Optional, supports Markdown.</p>
+				<p>
+					<textarea id="desc" rows="3" maxlength="32768" placeholder="## Features&#10;- *foo* **bar**"></textarea>
+				</p>
+				<h4>Blueprint String</h4>
+				<p>
+					<textarea id="bp" name="bp" rows="6" required minlength="3" placeholder="DSA:..." spellcheck="false"></textarea>
+				</p>
+				<p>
+					<input type="button" id="button-submit" value="Create">
+					<span id="error"></span>
+				</p>
+			</form>
+		</div>
+		<div class="card">
+			<h5>
+				Short Terms
+			</h5>
+			<ul class="smaller">
+				<li>Completely anonymous; only the data you enter is stored, with no personally identifiable information.</li>
+				<li>The stored data may be altered or deleted at any time for any reason.</li>
+				<li>The blueprints are not publicly listed but can be accessed with their link.</li>
+				<li>Users cannot edit or delete their own blueprints, but it is a planned feature.</li>
+			</ul>
+		</div>
 		<footer></footer>
 	</div>
 	<script type="module">
 		const credits = `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>.`
 
 		import { loadHF } from "/main.js"
-		loadHF(credits)
+		loadHF(credits, "Blueprint Bin")
 
 		const form = document.getElementById("form-post")
 		const submitButton = document.getElementById("button-submit")
+		const descTitle = document.getElementById("title")
 		const descInput = document.getElementById("desc")
-		const bpInput = document.getElementById("bp-input")
+		const bpInput = document.getElementById("bp")
 		const error = document.getElementById("error")
 
 		submitButton.addEventListener("click", async () => {
 			if (!form.reportValidity()) return
 
 			document.body.classList.add("processing")
-			const res = await fetch(location.href + "/new", {
+			const res = await fetch("./new", {
 				method: "POST",
-				redirect: "follow",
 				body: JSON.stringify({
+					title: descTitle.value,
 					desc: descInput.value,
 					str: bpInput.value
 				})
@@ -66,13 +91,14 @@
 
 			if (res == null)
 				return error.textContent = "Network error, check your connection."
+			if (res.status == 429)
+				return error.textContent = "Too many requests, try again later."
 			if (res.status == 400)
 				return error.textContent = (await res.json()).error
 			if (!res.ok)
 				return error.textContent = "Unexpected error."
 
-			if (res.redirected)
-				window.location.href = res.url
+			window.location.href = "./" + (await res.json()).id
 		})
 
 		bpInput.addEventListener("focus", () => bpInput.select())
@@ -97,18 +123,26 @@
 			color: #D8000C;
 		}
 
-		#desc {
-			width: 50%;
+		#desc,
+		#title {
+			width: 100%;
+			box-sizing: border-box;
 		}
 
-		#bp-input {
+		#bp {
 			width: 100%;
-			resize: vertical;
+			box-sizing: border-box;
 			font-size: 0.85em;
 		}
 
 		#button-submit {
 			font-size: 1.1em;
+			line-height: 1.7em;
+		}
+
+		form h4 {
+			padding-top: 0.4em;
+			margin-block-end: 0.5em;
 		}
 	</style>
 </body>

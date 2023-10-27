@@ -20,106 +20,112 @@
 <body>
 	<header></header>
 	<div id="main-container">
-		<small>Blueprint editing tools.</small>
-		<h3>Blueprint</h3>
-		<textarea id="bp-input" rows="1" placeholder="DSA:..." spellcheck="false" autocomplete="off" data-save></textarea>
-		<p id="notice-input"></p>
-		<h3>Options</h3>
-		<p id="chips-operation" class="radio-chips" style="font-size: large; margin-bottom: 1.25rem;">
-			<label><input type="radio" name="op" value="crop" data-save="chips-operation" checked>Crop</label>
-			<label><input type="radio" name="op" value="flip" data-save="chips-operation">Flip</label>
-			<label><input type="radio" name="op" value="rotate" data-save="chips-operation">Rotate</label>
-			<label><input type="radio" name="op" value="replace" data-save="chips-operation">Replace Items</label>
-		</p>
-		<div id="op-options">
-			<div data-op="crop" class="active">
-				Margins: <span class="tooltip-ref help-circle" data-allow-hover>
-					<span class="text">?</span>
-					<span class="tooltip-space"></span>
-				</span>
-				<span class="tooltip-content">
-					For example, to remove the hull from a full ship blueprint: Set the margins to 1 and the mode to "delete".
-				</span>
-				<p><i class="i arrow-d smaller"></i> Top: <input id="input-crop-top" type="number" value="0" data-save></p>
-				<p><i class="i arrow-l smaller"></i> Right: <input id="input-crop-right" type="number" value="0" data-save></p>
-				<p><i class="i arrow-u smaller"></i> Bottom: <input id="input-crop-bottom" type="number" value="0" data-save></p>
-				<p><i class="i arrow-r smaller"></i> Left: <input id="input-crop-left" type="number" value="0" data-save></p>
-				<p>Mode: <select id="select-crop-mode" data-save>
-						<option value="0">Delete Selected Area</option>
-						<option value="1">Keep Selected Area Only</option>
-					</select>
-				</p>
-			</div>
-			<div data-op="flip">
-				<p>Direction: <select id="select-flip-direction" data-save>
-						<option value="H">Horizontal</option>
-						<option value="V">Vertical</option>
-					</select>
-				</p>
-			</div>
-			<div data-op="rotate">
-				<p class="angle-inputs"><i class="i rotate-l-2"></i> Angle:
-					<input type="range" min="0" max="360" range-link-number>
-					<input id="input-rotate-angle" type="number" data-save style="width: 70px;">°
-					─ <span id="rotate-angle-buttons">
-						<button data-a="90">90° <i class="i rotate-l"></i></button>
-						<button data-a="270">90° <i class="i rotate-r"></i></button>
-						<button data-a="180">180° <i class="i rotate-l-3"></i></button>
-					</span>
-				</p>
-				<details>
-					<summary>Notes</summary>
-					<small>
-						<p>Requires some additional complex operations due to how multiple commands are compressed into smaller amounts.
-							As a result, it usually generates a blueprint that is significantly different from what the game generates.
-							It seems to compress even more, which could potentially lead to problems with build order, missing objects, or
-							configuration. Not much tested.
-						</p>
-						<p>Also removes any extra width and height (margins) from the blueprint.</p>
-					</small>
-				</details>
-			</div>
-			<div data-op="replace">
-				<p>
-					Items to find: <input id="input-replace-search" data-save placeholder="iron block, fabricator,comms, 236..."></input>
-				</p>
-				<p>
-					<small>
-						Separate items with commas. See
-						<span class="tooltip-ref" data-allow-hover data-click-triggered>
-							<a class="no-link">Item List</a>.
+		<div class="card">
+			<p class="smaller">Blueprint editing tools.</p>
+			<h3>Blueprint</h3>
+			<textarea id="bp-input" rows="1" placeholder="DSA:..." spellcheck="false" autocomplete="off" data-save></textarea>
+			<p id="notice-input"></p>
+			<h3>Options</h3>
+			<p id="chips-operation" class="radio-chips" style="font-size: large; margin-bottom: 1.25rem;">
+				<label><input type="radio" name="op" value="crop" data-save="chips-operation" checked>Crop</label>
+				<label><input type="radio" name="op" value="flip" data-save="chips-operation">Flip</label>
+				<label><input type="radio" name="op" value="rotate" data-save="chips-operation">Rotate</label>
+				<label><input type="radio" name="op" value="replace" data-save="chips-operation">Replace Items</label>
+			</p>
+			<div id="op-options">
+				<div data-op="crop" class="active">
+					<p>Margins:
+						<span class="tooltip-ref help-circle" data-allow-hover>
+							<span class="text">?</span>
 							<span class="tooltip-space"></span>
 						</span>
 						<span class="tooltip-content">
-							<span id="replace-item-list">
-								<b>Special Names:</b> <code>Air, Block, Buildable, Non-Buildable, Machine, 1x1 Machine, Big Machine, Hull Mounted</code>
-								<br><br>
-							</span>
+							For example, to remove the hull from a full ship blueprint: Set the margins to 1 and the mode to "delete".
 						</span>
-					</small>
-				</p>
-				<p>
-					Replace with: <input id="input-replace-replacement" data-save></input> <small style="display: inline-block;">(empty = delete)</small>
-				</p>
-				<details>
-					<summary>Notes</summary>
-					<small>
-						<p>When replacing "air", it does not take machine size into account. For example, it may place blocks behind a
-							fabricator. Additionally, it has the same effect as noted in the Rotate tool.</p>
-					</small>
-				</details>
+					</p>
+					<p><i class="i arrow-d smaller"></i> Top: <input id="input-crop-top" type="number" value="0" data-save></p>
+					<p><i class="i arrow-l smaller"></i> Right: <input id="input-crop-right" type="number" value="0" data-save></p>
+					<p><i class="i arrow-u smaller"></i> Bottom: <input id="input-crop-bottom" type="number" value="0" data-save></p>
+					<p><i class="i arrow-r smaller"></i> Left: <input id="input-crop-left" type="number" value="0" data-save></p>
+					<p>Mode: <select id="select-crop-mode" data-save>
+							<option value="0">Delete Selected Area</option>
+							<option value="1">Keep Selected Area Only</option>
+						</select>
+					</p>
+				</div>
+				<div data-op="flip">
+					<p>Direction: <select id="select-flip-direction" data-save>
+							<option value="H">Horizontal</option>
+							<option value="V">Vertical</option>
+						</select>
+					</p>
+				</div>
+				<div data-op="rotate">
+					<p class="angle-inputs"><i class="i rotate-l-2"></i> Angle:
+						<input type="range" min="0" max="360" range-link-number>
+						<input id="input-rotate-angle" type="number" data-save style="width: 70px;">°
+						─ <span id="rotate-angle-buttons">
+							<button data-a="90">90° <i class="i rotate-l"></i></button>
+							<button data-a="270">90° <i class="i rotate-r"></i></button>
+							<button data-a="180">180° <i class="i rotate-l-3"></i></button>
+						</span>
+					</p>
+					<details>
+						<summary>Notes</summary>
+						<small>
+							<p>Requires some additional complex operations due to how multiple commands are compressed into smaller amounts.
+								As a result, it usually generates a blueprint that is significantly different from what the game generates.
+								It seems to compress even more, which could potentially lead to problems with build order, missing objects, or
+								configuration. Not much tested.
+							</p>
+							<p>Also removes any extra width and height (margins) from the blueprint.</p>
+						</small>
+					</details>
+				</div>
+				<div data-op="replace">
+					<p>
+						Items to find: <input id="input-replace-search" data-save placeholder="iron block, fabricator,comms, 236..."></input>
+					</p>
+					<p>
+						<small>
+							Separate items with commas. See
+							<span class="tooltip-ref" data-allow-hover data-click-triggered>
+								<a class="no-link">Item List</a>.
+								<span class="tooltip-space"></span>
+							</span>
+							<span class="tooltip-content">
+								<span id="replace-item-list">
+									<b>Special Names:</b> <code>Air, Block, Buildable, Non-Buildable, Machine, 1x1 Machine, Big Machine, Hull Mounted</code>
+									<br><br>
+								</span>
+							</span>
+						</small>
+					</p>
+					<p>
+						Replace with: <input id="input-replace-replacement" data-save></input> <small style="display: inline-block;">(empty = delete)</small>
+					</p>
+					<details>
+						<summary>Notes</summary>
+						<small>
+							<p>When replacing "air", it does not take machine size into account. For example, it may place blocks behind a
+								fabricator. Additionally, it has the same effect as noted in the Rotate tool.</p>
+						</small>
+					</details>
+				</div>
 			</div>
-		</div>
-		<button class="colored" id="button-process">Process</button>
-		<label><small>Auto Copy: <input id="cb-auto-copy" type="checkbox" data-save> <span id="notice-copy"></span></small></label>
-		<h3 id="result-heading">
-			Result
-			<button id="button-copy">Copy</button>
-			<button id="button-move">Move to Input <i class="i arrow-long-u"></i></button>
-		</h3>
-		<p id="notice-result"></p>
-		<div id="result-container">
-			<textarea id="result" rows="1" readonly spellcheck="false"></textarea>
+			<p>
+				<button id="button-process">Process</button>
+				<label><small>Auto Copy: <input id="cb-auto-copy" type="checkbox" data-save> <span id="notice-copy"></span></small></label>
+			</p>
+			<h3 id="result-heading">
+				Result
+				<button id="button-copy">Copy</button>
+				<button id="button-move">Move to Input <i class="i arrow-long-u"></i></button>
+			</h3>
+			<p id="notice-result"></p>
+			<div id="result-container">
+				<textarea id="result" rows="1" readonly spellcheck="false"></textarea>
+			</div>
 		</div>
 		<footer></footer>
 	</div>

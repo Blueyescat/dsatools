@@ -11,17 +11,17 @@ if (elFooter) await fetch("/assets/footer.html").then(res => res.text()).then(ht
 	elFooter.insertAdjacentHTML("beforeend", html)
 }).catch(console.error)
 
-export function loadHF(credits) {
+export function loadHF(credits, title = document.title) {
 	const dd = document.querySelector("header nav .dropdown")
-	dd.getElementsByClassName("text")[0].innerHTML = location.pathname == "/" ? "Tools" : document.title
+	dd.getElementsByClassName("text")[0].innerHTML = location.pathname == "/" ? "Tools" : title
 	dd.querySelectorAll(".content>a").forEach(el => {
-		if (el.textContent == document.title) {
+		if (el.textContent == title) {
 			el.classList.add("active")
 			return
 		}
 	})
 	if (credits)
-		document.getElementById("credits").innerHTML = document.title + " " + credits
+		document.getElementById("credits").innerHTML = title + " " + credits
 }
 
 document.querySelectorAll(".custom-file-input").forEach(el => {
@@ -98,16 +98,16 @@ function tooltipInteractionHandler() {
 	}, { once: true })
 
 	if (usesTouch) {
-		ttpCloseHandler = function (e) {
-			if (e.target != ref && !content.contains(e.target)) {
+		ttpCloseHandler = e => {
+			if (!ref.contains(e.target) && !content.contains(e.target)) {
 				closeTooltip(content, space)
 				window.removeEventListener("touchend", ttpCloseHandler)
 			}
 		}
 		window.addEventListener("touchend", ttpCloseHandler)
 	} else {
-		ttpCloseHandler = function (e) {
-			if (e.relatedTarget?.parentElement == ref)
+		ttpCloseHandler = e => {
+			if (ref.contains(e.relatedTarget))
 				return ref.addEventListener("mouseleave", ttpCloseHandler, { once: true })
 			if (e.relatedTarget == space)
 				return space.addEventListener("mouseleave", ttpCloseHandler, { once: true })
@@ -128,7 +128,10 @@ function tooltipInteractionHandler() {
 	}
 
 	function closeTooltip(content, space) {
-		ref.removeEventListener(usesTouch ? "touchend" : "mouseleave", ttpCloseHandler)
+		if (usesTouch)
+			window.removeEventListener("touchend", ttpCloseHandler)
+		else
+			ref.removeEventListener("mouseleave", ttpCloseHandler)
 		content.style.display = ""
 		if (space) space.style.display = ""
 	}

@@ -110,7 +110,7 @@ async function loadBaseImage(src, fileName) {
 
 cbUseTurretScale.addEventListener("change", () => {
 	if (hasSetWidth || hasSetHeight || !hasChosenImage) return
-	autoFillDims(this.checked)
+	autoFillDims(cbUseTurretScale.checked)
 })
 
 function autoFillDims(turretScale) {
@@ -143,7 +143,7 @@ inputHeight.addEventListener("input", function () {
 })
 
 inputCoordX.addEventListener("input", () => inShipCoordX = parseInt(inputCoordX.value))
-inputCoordY.addEventListener("input", () => inShipCoordY = parseInt(inputCoordX.value))
+inputCoordY.addEventListener("input", () => inShipCoordY = parseInt(inputCoordY.value))
 
 buttonProcess.addEventListener("click", async () => {
 	if (!hasChosenImage)
@@ -161,6 +161,7 @@ buttonProcess.addEventListener("click", async () => {
 	if (isNaN(fontSize))
 		return notice("The entered font size is invalid.")
 	notice()
+
 	canvas.width = width
 	canvas.height = height
 	elResultInfo.textContent = "..."
@@ -196,12 +197,18 @@ buttonProcess.addEventListener("click", async () => {
 	displayPixelSize = pixelSize
 	displayPaintHeight = height
 	elResultInfo.textContent = `${width}x${height}sq - ${imageData.width}x${imageData.height}px - ${Math.round(performance.now() - start)}ms`
+
 	canvas.width = displayWidth = imageData.width
 	canvas.height = displayHeight = imageData.height
 	canvasCtx.putImageData(imageData, 0, 0)
+
 	imgResult.src = URL.createObjectURL(await new Promise(resolve => canvas.toBlob(resolve)))
-	if (resultZoomist) resultZoomist.destroy()
+
 	elResultSquare.style.display = "none"
+	resultZoomist?.destroy()
+
+	if (!imgResult.complete)
+		await new Promise(resolve => imgResult.addEventListener("load", resolve))
 	resultZoomist = new Zoomist(".zoomist-container", {
 		bounds: false,
 		zoomRatio: 0.3,
@@ -299,11 +306,11 @@ imgResult.addEventListener(usesTouch ? "touchend" : "click", e => {
 void async function () {
 	let html = ""
 	if (navigator.keyboard) {
-		await navigator.keyboard.getLayoutMap().then((map) => {
+		await navigator.keyboard.getLayoutMap().then(map => {
 			html += `(The debug key should be <b>${map.get("Slash")}</b> for your locale)`
 		})
 	} else {
-		html += "(The debug key is Slash <b>/</b>, might be something else depending on your locale, like the period <b>.</b>)"
+		html += "(The debug key is slash <b>/</b>, might be something else depending on your locale, like period <b>.</b>)"
 	}
 	document.getElementById("debug-key-info").insertAdjacentHTML("beforeend", html)
 }()

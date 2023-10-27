@@ -19,29 +19,31 @@
 <body>
 	<header></header>
 	<div id="main-container" style="min-height: 100vh;">
-		<p style="margin-top: 0;">
-			<small>
-				The data is downloaded from
-				<a href="https://pub.drednot.io/test/econ/item_schema.json" target="_blank">pub.drednot.io/test/econ/item_schema.json</a>
-				as the page loads, and that file updates at 0 UTC.
-			</small>
-		</p>
-		<p>
-			<input id="input-search" autocomplete="off" placeholder="Search items by name, description or ID"></input>
-			<button id="button-clear"><i class="i x"></i></button>
-			<small style="float: right; padding-top: 1em;">Showing <span id="shown"></span><span id="total">-</span> items</small>
-		</p>
-		<table>
-			<thead>
-				<tr>
-					<th style="width: 10%;">Image</th>
-					<th style="width: 5%;">ID</th>
-					<th style="width: 20%;">Name</th>
-					<th style="width: 50%;">Description</th>
-				</tr>
-			</thead>
-			<tbody id="content"></tbody>
-		</table>
+		<div class="card">
+			<p style="margin-top: 0;">
+				<small>
+					The data is downloaded from
+					<a href="https://pub.drednot.io/test/econ/item_schema.json" target="_blank">pub.drednot.io/test/econ/item_schema.json</a>
+					as the page loads, and that file updates at 0 UTC.
+				</small>
+			</p>
+			<p>
+				<input id="input-search" autocomplete="off" placeholder="Search items by name, description or ID"></input>
+				<button id="button-clear"><i class="i x"></i></button>
+				<small style="float: right; padding-top: 1em;">Showing <span id="shown"></span><span id="total">-</span> items</small>
+			</p>
+			<table>
+				<thead>
+					<tr>
+						<th style="width: 10%;">Image</th>
+						<th style="width: 5%;">ID</th>
+						<th style="width: 20%;">Name</th>
+						<th style="width: 50%;">Description</th>
+					</tr>
+				</thead>
+				<tbody id="content"></tbody>
+			</table>
+		</div>
 		<footer></footer>
 	</div>
 	<script type="module">
@@ -118,21 +120,14 @@
 
 		td>img {
 			vertical-align: middle;
+			width: 24px;
+			height: 24px;
 		}
 
 		th,
 		td {
 			padding: 0.4rem 0.85rem;
-		}
-
-		th,
-		td {
 			text-align: center;
-		}
-
-		img {
-			width: 24px;
-			height: 24px;
 		}
 
 		td:nth-child(2),

@@ -1,5 +1,5 @@
 // changing this file makes the browser update the active SW, and changing cacheName makes it re-cache all files
-const cacheName = "dsatools-v2"
+const cacheName = "dsatools-v3"
 
 // TODO: Automate cacheUrls
 
@@ -17,7 +17,7 @@ for (const p of (" main.css main.js converter.js worker.js assets/bg_ship.png as
 for (const p of (" main.css main.js operations.js").split(" "))
 	cacheUrls.push("bpeditor/" + p)
 
-const fetchFirstList = new RegExp(`/item_schema\\.json$|${location.origin}/($|bpbin/\\w*|main.css)`)
+const fetchFirstList = new RegExp(`/item_schema\\.json$|^https://(test\\.)?drednot\\.io/|^${location.origin}/($|bpbin/\\w*|main\\.css)`)
 const noCacheList = /\/bpbin\/\w+|\/\/res.cloudinary.com\//
 
 self.addEventListener("install", e => {

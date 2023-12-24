@@ -32,7 +32,7 @@
 						<li>Size of the strings: <b><%= (bytesStr / 1024).toFixed(3) %> KB</b></li>
 						<li>Size of the titles and descriptions: <b><%= (bytesDesc / 1024).toFixed(3) %> KB</b></li>
 						<li>Size of the preview images: <b><%= (bytesImg / (1024 * 1024)).toFixed(1) %> MB</b></li>
-						<li>Time spent generating the current previews: <b><%= renderTime[0] %> hours and <%= renderTime[1].toFixed(3) %> seconds</b></li>
+						<li>Time spent rendering the current previews: <b><%= renderTime[0] %> minutes and <%= renderTime[1].toFixed(3) %> seconds</b></li>
 						<li>Blueprint views: <b><%= views %></b></li>
 						<li>Blueprint commands: <b><%= cmdsBuild %> build</b> and <b><%= cmdsConfig %> config</b></li>
 					</ul>

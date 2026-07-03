@@ -1,9 +1,14 @@
 {
-  "javascript.format.semicolons": "remove",
-  "javascript.preferences.quoteStyle": "double",
-  "typescript.format.semicolons": "remove",
-  "typescript.preferences.quoteStyle": "double",
-  "html.format.extraLiners": "",
-  "html.format.wrapLineLength": 0,
-  "files.insertFinalNewline": true
+	"javascript.format.semicolons": "remove",
+	"javascript.preferences.quoteStyle": "double",
+	"javascript.preferences.importModuleSpecifierEnding": "js",
+	"typescript.format.semicolons": "remove",
+	"typescript.preferences.quoteStyle": "double",
+	"typescript.preferences.importModuleSpecifierEnding": "js",
+	"html.format.extraLiners": "",
+	"html.format.wrapLineLength": 0,
+	"files.insertFinalNewline": true,
+	"css.format.newlineBetweenRules": false,
+	"css.lint.zeroUnits": "warning",
+	"deno.enable": false
 }

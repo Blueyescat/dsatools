@@ -1,0 +1,5 @@
+dist/
+database/
+game-images/
+.env
+tn.png

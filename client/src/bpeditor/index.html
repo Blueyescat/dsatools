@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base href="/bpeditor/">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Blueprint editor for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Blueprint Editor - DSA Tools">
+	<meta property="og:description" content="Blueprint map editor.">
+	<meta property="theme-color" content="#1f80b1">
+	<title>Blueprint Editor</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script type="module">
+		window.addEventListener("keydown", window["blockKeysHandler"] = e => (e.ctrlKey || e.metaKey) && e.preventDefault())
+		globalThis.toolPath = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))
+	</script>
+	<script type="module" src="/assets/sw-reg.js"></script>
+	<link rel="apple-touch-icon" href="/assets/icons/180a.png">
+	<link rel="icon" href="/assets/icons/144.svg" type="image/svg+xml">
+	<link rel="stylesheet" href="/main.css" type="text/css">
+	<link rel="stylesheet" href="main.css" type="text/css">
+</head>
+<body>
+	<header style="display: none;"></header>
+	<div id="dialog-container"></div>
+	<main>
+		<div id="top-bar" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+			<div id="menu-bar">
+				<span style="display: inline-flex; position: relative; background-color: var(--container-color);">
+					<img id="top-left-app-icon" src="/assets/icons/144.svg" alt="App Icon" height="19" style="padding: 2px 7px; align-self: center;">
+					<div class="dropdown menu">
+						<button class="dropdown-trigger">File</button>
+						<ul tabindex="0">
+							<li><button id="button-menu-new">New Map...<span class="kb">N</span></button></li>
+							<li><button id="button-menu-import-bp">Load & Place Blueprint...</button></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-view-bp">View/Load Blueprint String<span class="kb">B</span></button></li>
+							<li><button id="button-menu-copy-bp">Copy Blueprint String<span class="kb">Ctrl+S</span></button></li>
+							<li><button id="button-menu-exportimage">Export Image</button></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-close-map">Close Map</button></li>
+						</ul>
+					</div>
+					<div class="dropdown menu">
+						<button class="dropdown-trigger">Edit</button>
+						<ul tabindex="0">
+							<li><button id="button-menu-undo" class="disabled">Undo<span class="kb">Ctrl+Z</span></button></li>
+							<li><button id="button-menu-redo" class="disabled">Redo<span class="kb">Ctrl+Shift+Z / Ctrl+Y</span></button></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-cut" class="disabled">Cut Selected<span class="kb">Ctrl+X</span></button></li>
+							<li><button id="button-menu-copy" class="disabled">Copy Selected<span class="kb">Ctrl+C</span></button></li>
+							<li><button id="button-menu-paste" class="disabled">Paste Objects<span class="kb">Ctrl+V</span></button></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-duplicate" class="disabled">Duplicate Selected<span class="kb">Ctrl+D</span></button></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-delete" class="disabled">Delete Selected<span class="kb">Delete</span></button></li>
+							<li class="hr"></li>
+							<li class="dropdown-trigger">
+								<button>Transform</button>
+								<ul tabindex="0">
+									<li><button id="button-menu-sel-rotate" class="disabled">Rotate...</button></li>
+									<li><button id="button-menu-sel-rotate-90l" class="disabled"><span>Rotate 90° <i class="i rotate-r fH"></i></span></button></li>
+									<li><button id="button-menu-sel-rotate-90r" class="disabled"><span>Rotate 90° <i class="i rotate-r"></i></span></button></li>
+									<li><button id="button-menu-sel-rotate-180" class="disabled">Rotate 180°</button></li>
+									<li class="hr"></li>
+									<li><button id="button-menu-sel-flip-h" class="disabled">Flip Horizontally</button></li>
+									<li><button id="button-menu-sel-flip-v" class="disabled">Flip Vertically</button></li>
+								</ul>
+							</li>
+							<li><button id="button-menu-findreplace">Find - Replace<span class="kb">Ctrl+F/H</span></button></li>
+						</ul>
+					</div>
+					<div class="dropdown menu">
+						<button class="dropdown-trigger">Map</button>
+						<ul tabindex="0">
+							<li class="dropdown-trigger">
+								<button>Transform</button>
+								<ul tabindex="0">
+									<li><button id="button-menu-map-rotate-90l"><span>Rotate 90° <i class="i rotate-r fH"></i></span></button></li>
+									<li><button id="button-menu-map-rotate-90r"><span>Rotate 90° <i class="i rotate-r"></i></span></button></li>
+									<li><button id="button-menu-map-rotate-180">Rotate 180°</button></li>
+									<li class="hr"></li>
+									<li><button id="button-menu-map-flip-h">Flip Horizontally</button></li>
+									<li><button id="button-menu-map-flip-v">Flip Vertically</button></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+					<div class="dropdown menu">
+						<button class="dropdown-trigger">View</button>
+						<ul tabindex="0">
+							<li><button id="button-menu-reset-zoom">Reset Zoom<span class="kb">C</span></button></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-itemmatlist">List of Items & Materials</button></li>
+						</ul>
+					</div>
+					<div class="dropdown menu">
+						<button class="dropdown-trigger">More</button>
+						<ul tabindex="0">
+							<li><button id="button-menu-collab">Collaborate</button></li>
+							<li><button id="button-menu-pusherfocuser">Pusher Focuser</button></li>
+							<li><button id="button-menu-mods">Asset Modification</button></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-guide">Guide</button></li>
+							<li class="hr"></li>
+							<li><a href="https://github.com/Blueyescat/dsatools/issues/new" target="_blank">Report Issue...</a></li>
+							<li class="hr"></li>
+							<li><button id="button-menu-about">About</button></li>
+						</ul>
+					</div>
+				</span>
+				<span id="menu-bar-center">
+					<div class="dropdown menu">
+						<span id="hide-header-info" style="display: none;"><i class="i arrow-r r90"></i>Using this button will hide this header</span>
+						<button class="dropdown-trigger" id="button-app-nav">
+							<span class="name" style="pointer-events: none;">DSA Tools</span>
+							<img src="/assets/icons/144.svg" alt="App Icon" height="19">
+							<span class="arrow-icon" style="height: 1em;"></span>
+						</button>
+						<ul tabindex="0" id="app-nav" style="font-size: large;">
+							<li><a class="no-style" href="/">Home</a></li>
+						</ul>
+					</div>
+				</span>
+				<span class="right-spacer"></span>
+			</div>
+			<!-- <div id="options-bar"></div> -->
+		</div>
+		<div style="flex: 1; min-height: 0; display: flex;">
+			<div id="toolbar">
+				<div class="radio-chips" id="chips-tools">
+					<label class="tooltip-ref" data-only-long-t data-show-right>
+						<input type="radio" name="tool" value="select" checked>
+						<i class="i pointer"></i>
+						<small class="tooltip-content">
+							<b>Select Tool<span class="mobile-hidden"> (Q)</span></b>
+							<ul>
+								<li> 
+									Select objects by clicking or clicking and holding the LMB. You can use the Ctrl and Shift keys to add to selection, remove from selection, and invert selection.
+									<ul>
+										<li>Selected objects can be moved by dragging them and can be deleted by pressing the Delete key.</li>
+										<li>Selected objects can be duplicated by copy-pasting them (Ctrl+C/V) or dragging objects while holding the Alt key.</li>
+									</ul>
+								</li>
+								<li>Configure objects by double clicking or right clicking.</li>
+							</ul>
+						</small>
+					</label>
+					<label class="tooltip-ref" data-only-long-t data-show-right>
+						<input type="radio" name="tool" value="place">
+						<i class="i grid-plus"></i>
+						<small class="tooltip-content">
+							<b>Place Tool<span class="mobile-hidden"> (F)</span></b>
+							<ul class="mobile-hidden">
+								<li>Hold the shortcut key to open the item picker.</li>
+								<li>Right-click to quickly remove placed objects.</li>
+								<li>Hold the Shift key to place a line.</li>
+								<ul>
+									<li>Hold the Alt key to lock its angle based on the first two objects for a straight line.</li>
+								</ul>
+							</ul>
+						</small>
+					</label>
+					<label class="tooltip-ref" data-only-long-t data-show-right>
+						<input type="radio" name="tool" value="eraser">
+						<i class="i eraser"></i>
+						<small class="tooltip-content">
+							<b>Eraser Tool<span class="mobile-hidden"> (E)</span></b>
+						</small>
+					</label>
+					<label class="tooltip-ref" data-only-long-t data-show-right>
+						<input type="radio" name="tool" value="crop">
+						<i class="i crop"></i>
+						<small class="tooltip-content">
+							<b>Crop Tool<span class="mobile-hidden"> (T)</span></b>
+							<ul>
+								<li>Select a cropping area by clicking and holding the left mouse button. The area is resizable. Press the Enter key or double tap to apply it.</li>
+								<ul>
+									<li>Only the outlined objects will be kept after cropping. A cyan box indicates the new ship dimensions: it snaps to the grid, expands to fit the included objects, and shows the length of each edge.</li>
+								</ul>
+							</ul>
+						</small>
+					</label>
+					<label class="tooltip-ref" data-only-long-t data-show-right>
+						<input type="radio" name="tool" value="bpexport">
+						<i class="i export-rect" style="padding-left: 3px;"></i>
+						<small class="tooltip-content">
+							<b>Blueprint Export Tool<span class="mobile-hidden"> (G)</span></b>
+							<ul>
+								<li>Export a blueprint for the selected area, just like the Blueprint Scanner in the game.</li>
+								<li>Select the area by clicking and holding the left mouse button.</li>
+							</ul>
+						</small>
+					</label>
+				</div>
+				<div id="item-picker-area">
+					<dt-item-slot id="item-picker-preview"></dt-item-slot>
+					<i class="line"></i>
+					<button id="button-item-config" class="tooltip-ref" data-only-long-t data-show-right>
+						<i class="i sliders"></i>
+						<small class="tooltip-content">
+							Configure the selected item<span class="mobile-hidden"> (R)</span>
+						</small>
+					</button>
+				</div>
+				<div id="mobile-unredo-area" class="mobile-only">
+					<button id="button-undo" class="disabled" style="margin-bottom: 0.5em;">
+						<i class="i undo"></i>
+					</button>
+					<button id="button-redo" class="disabled">
+						<i class="i undo fH"></i>
+					</button>
+				</div>
+			</div>
+			<div id="map-container">
+				<div id="canvas-container">
+					<canvas id="canvas-map"></canvas>
+				</div>
+			</div>
+			<div id="hotbar"></div>
+		</div>
+	</main>
+	<script type="module">import { Dialog } from "/Dialog.js"; Dialog.defaultParent = document.getElementById("dialog-container")</script>
+	<script type="module" src="main.js"></script>
+	<script type="module" src="/assets/goatc.js"></script>
+	<svg style="width: 0; height: 0; position: absolute;"><defs id="svg-defs"></defs></svg>
+</body>
+</html>

@@ -1,0 +1,915 @@
+html,
+body {
+	touch-action: pan-x pan-y;
+}
+
+main {
+	max-width: none;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
+#button-app-nav[data-open]>.arrow-icon {
+	transform: scaleY(-1);
+}
+
+#button-app-nav>img {
+	display: none;
+	margin-top: -4px;
+	vertical-align: middle;
+	pointer-events: none;
+}
+
+@media (max-width: 375px) {
+	#button-app-nav>img {
+		display: unset;
+	}
+	#button-app-nav>.name,
+	#top-left-app-icon {
+		display: none;
+	}
+}
+
+#menu-bar {
+	user-select: none;
+	-webkit-user-select: none;
+	display: flex;
+}
+#menu-bar>* {
+	flex: 1 0 0;
+}
+
+#menu-bar .dropdown>button {
+	padding: 9px 10px 7px 10px;
+	cursor: pointer;
+	font-size: smaller;
+	background-color: unset;
+	border-radius: 0;
+}
+
+#menu-bar .dropdown>button:is(:hover, [data-open], :focus) {
+	background-color: var(--button-active-color);
+	outline: none;
+}
+
+#menu-bar-center {
+	background-color: var(--container-color);
+	display: flex;
+	justify-content: center;
+}
+@media (max-width: 768px) {
+	#menu-bar-center {
+		justify-content: flex-end;
+	}
+	#menu-bar .right-spacer {
+		display: none;
+	}
+}
+
+.dropdown.menu ul {
+	padding: 4px 0;
+}
+
+.dropdown.menu ul>li.hr {
+	margin: 5px 0;
+	border-bottom: 1px solid var(--button-color);
+}
+
+.dropdown.menu ul>li>button.disabled {
+	filter: brightness(0.6);
+}
+
+.dropdown.menu ul>li>a.disabled {
+	filter: brightness(0.6);
+	cursor: default;
+	pointer-events: none;
+}
+
+.dropdown.menu ul>li:hover>a:not(.disabled) {
+	background-color: var(--button-active-color);
+	border-radius: 4px;
+}
+
+.dropdown.menu ul>li>:is(button, a) {
+	padding: 5px 26px;
+}
+
+.dropdown.menu ul>li>:is(button, a)>.kb {
+	margin-left: 2.5em;
+}
+
+@media (pointer: coarse) {
+	.dropdown ul>li>:is(button, a)>.kb {
+		display: none !important;
+	}
+}
+
+.dropdown.menu li {
+	padding: 0 4px;
+}
+
+.dropdown.menu li>:is(button, a) {
+	display: inline-flex;
+	pointer-events: none;
+	width: 100%;
+	background-color: unset;
+	justify-content: space-between;
+	box-sizing: border-box;
+}
+
+.dropdown.menu li:is(:hover, [data-open])>button:not(.disabled),
+.dropdown.menu li>:is(button, a):not(.disabled):focus {
+	background-color: var(--button-active-color);
+	outline: none;
+}
+
+header {
+	transition: opacity 2s;
+}
+
+#hide-header-info {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	width: max-content;
+	position: absolute;
+	left: 45%;
+	font-size: large;
+	animation: up-down 3s infinite;
+}
+
+
+@media (max-width: 768px) {
+	#hide-header-info {
+		left: unset;
+		right: 10%;
+		flex-direction: row-reverse;
+		font-size: medium;
+	}
+}
+
+@media (max-width: 950px) {
+	#header-content {
+		padding-bottom: 1em;
+	}
+}
+
+
+@keyframes up-down {
+	0%,
+	20%,
+	100% {
+		top: -40px;
+	}
+	10% {
+		top: -28px;
+	}
+}
+
+
+#map-container {
+	padding: 0;
+	box-sizing: border-box;
+	flex: 1;
+	display: flex;
+	min-height: 0;
+	min-width: 0;
+	border-top: 2px solid #3b3b3b;
+}
+
+#canvas-container {
+	position: relative;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: none;
+	width: 100%;
+	overflow: hidden;
+}
+
+#canvas-map {
+	box-sizing: border-box;
+}
+
+#bp,
+.bp {
+	resize: vertical;
+	font-size: 0.85em;
+	width: 40vw;
+	min-width: 100%;
+	box-sizing: border-box;
+	transition: border-color 0.3s;
+}
+
+#bp.changing {
+	border-color: var(--blue)
+}
+
+#top-bar {
+	background-color: var(--container-color);
+	width: 100%;
+	box-sizing: border-box;
+}
+
+/* #options-bar {
+	display: flex;
+	align-items: center;
+	user-select: none;
+	-webkit-user-select: none;
+	gap: 1em;
+	padding: 0 9px 2px 40px;
+}
+
+#options-bar:empty {
+	display: none;
+} */
+
+#toolbar {
+	--tool-w: 36px;
+	--sel-tool-border-w: 3px;
+	display: flex;
+	flex-direction: column;
+	gap: 2.5em;
+	background-color: var(--container-color);
+	padding: 1em 0;
+	user-select: none;
+	-webkit-user-select: none;
+	overflow-y: auto;
+	scrollbar-width: none;
+	/* scrollbar makes the item slot appear under map container's border, this is alternative to border */
+	box-shadow: inset -2px 0 0 0 #3b3b3b;
+	padding-right: 2px;
+}
+#toolbar::-webkit-scrollbar {
+	width: 0;
+}
+
+#chips-tools {
+	display: flex;
+	gap: 0.5em;
+	flex-direction: column;
+}
+
+#chips-tools>label:is(:has(input[type="radio"]:checked), [data-chk]) {
+	outline: none;
+	box-shadow: inset var(--sel-tool-border-w) 0 0 var(--blue);
+}
+
+#chips-tools>label,
+#button-item-config {
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#chips-tools>label {
+	font-size: 1.21em;
+	width: var(--tool-w);
+	height: var(--tool-w);
+	border-radius: 0;
+}
+
+#chips-tools .tooltip-content ul {
+	list-style-position: inside;
+	padding-inline-start: 1em;
+}
+#chips-tools .tooltip-content>ul {
+	padding-inline-start: 0 !important;
+}
+
+@supports not (-moz-appearance:none) {
+	#chips-tools .tooltip-content ul li:before {
+		content: "";
+		margin-left: -0.5rem;
+	}
+}
+
+#mobile-unredo-area {
+	width: var(--tool-w);
+}
+
+#mobile-unredo-area>button {
+	width: 100%;
+	font-size: 1em;
+	padding-left: 0;
+	padding-right: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+@media (max-width: 568px) {
+	#toolbar {
+		--tool-w: 34px;
+		--sel-tool-border-w: 4px
+	}
+}
+
+#item-picker-area {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#item-picker-area>.line {
+	height: 1em;
+	margin-top: 6px;
+	border: 1px dashed var(--input-border-color);
+}
+
+#item-picker-area>dt-item-slot {
+	--slot-size: calc(var(--tool-w) - 2px);
+	--slot-rgb: 230 230 230 !important;
+	margin-top: 2px;
+	margin-left: 2px;
+}
+
+/* hotbar */
+#hotbar {
+	position: fixed;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	user-select: none;
+	-webkit-user-select: none;
+	background-color: rgb(var(--container-rgb) / 0.4);
+	padding: 8px 8px 5px;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	white-space: nowrap;
+	max-width: 71vw;
+	overflow-x: auto;
+	border: 2px solid transparent;
+}
+#hotbar>dt-item-slot:not(:last-child) {
+	margin-right: 6px;
+}
+#hotbar>dt-item-slot {
+	position: relative;
+	--slot-rgb: 230 230 230 !important;
+	--slot-alpha: 0.5;
+	/* so selected slot doesn't affect hotbar height */
+}
+#hotbar>dt-item-slot.selected {
+	--slot-size: 36px;
+	margin-top: -4px;
+}
+
+@media not (pointer: coarse) {
+	#hotbar>dt-item-slot:after {
+		content: attr(data-key);
+		position: absolute;
+		right: 1px;
+		bottom: 0;
+		line-height: 1;
+		text-shadow: 0 0 2px black, 0 0 2px black, 0 0 2px black, 0 0 2px black, 0 0 2px black, 0 0 2px black, 0 0 2px black;
+		font-size: 0.9em;
+	}
+}
+
+@media (max-width: 568px) {
+	#hotbar>dt-item-slot {
+		--slot-size: 28px;
+	}
+	#hotbar>dt-item-slot.selected {
+		--slot-size: 32px;
+	}
+}
+
+#dialog-bpstring details:is(.sorter, .build-dir)[open] .active-state {
+	display: inline !important;
+	font-weight: bold;
+}
+
+#button-item-config {
+	font-size: 1.1em;
+	padding: 4px;
+}
+
+#dialog-findreplace .config-line {
+	width: 0.7em;
+	margin-right: 1px;
+	border: 1px dashed var(--input-border-color);
+}
+
+#dialog-findreplace .items-to-find {
+	display: inline-flex;
+	flex-direction: column;
+	vertical-align: top;
+	flex-wrap: wrap;
+	max-height: 32vh;
+	gap: 0.5em 0.65em;
+	overflow: auto;
+	padding-bottom: 2px;
+}
+
+#dialog-findreplace .items-to-find>*,
+#dialog-findreplace .replacement-item {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+}
+
+#dialog-findreplace dt-item-slot {
+	margin: 2px;
+}
+
+#dialog-findreplace .items-to-find>* dt-item-slot {
+	--slot-size: 30px;
+}
+
+#dialog-findreplace .button-config {
+	padding: 4px;
+}
+
+#dialog-findreplace .button-config.open {
+	outline: 2px dashed white;
+}
+
+#dialog-findreplace .button-config.used {
+	border: 1px solid var(--blue);
+	margin: -1px;
+}
+
+#dialog-findreplace .find-groups>ul>li label {
+	width: 100%;
+	padding: 0.2em 0.5em;
+	display: block;
+	box-sizing: border-box;
+}
+
+#dialog-findreplace .find-groups>ul>li label>input {
+	margin-right: 0.6em;
+}
+
+#dialog-findreplace .find-groups>ul>li label:hover {
+	background-color: var(--button-active-color);
+	cursor: pointer;
+}
+
+#dialog-findreplace .find-groups .dropdown-trigger[data-open] .i.angle-right:before {
+	transform: rotate(-90deg);
+}
+
+#dialog-findreplace .items-to-find>:last-child .button-remove-item {
+	visibility: hidden;
+}
+
+#dialog-findreplace .button-remove-item {
+	background: none;
+	font-size: 0.6em;
+	filter: brightness(0.6);
+	padding: 1em 0.5em 1em 0.5em;
+	margin-left: 1em;
+}
+
+#dialog-findreplace .button-remove-item:hover {
+	filter: unset;
+}
+
+#dialog-findreplace select {
+	padding: 1px;
+	vertical-align: middle;
+	background: none;
+	border-style: dashed;
+	color: inherit;
+	font-family: inherit;
+	cursor: pointer;
+	vertical-align: 0;
+}
+#dialog-findreplace select:focus-visible {
+	outline: none;
+	border: 1px solid currentColor;
+}
+
+#dialog-findreplace .tricb:is(.cb-selecteds, .cb-invalids)[data-state=true]:before {
+	clip-path: polygon(0% 20%, 100% 20%, 100% 40%, 0% 40%,
+			0% 60%, 100% 60%, 100% 80%, 0% 80%)
+}
+
+#dialog-collab>.body {
+	text-align: center;
+}
+
+#dialog-collab.offline>.body>.container {
+	opacity: 0.4;
+	pointer-events: none;
+}
+
+#dialog-collab.offline>.body>.offline {
+	display: block !important;
+	color: red;
+}
+
+#dialog-guide>.body code {
+	padding: 0.2em;
+	margin: 0;
+	font-size: 0.875rem;
+	background-color: var(--body-color);
+	border-radius: 6px;
+	border: 1px solid var(--button-active-color);
+}
+#dialog-guide>.body h2,
+#dialog-guide>.body h3,
+#dialog-guide>.body h4 {
+	margin-block-end: 0.5em;
+}
+
+#dialog-welcome>.body {
+	padding: clamp(1em, 3vw, 6em);
+}
+#dialog-welcome .recent-list {
+	max-width: 636px;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+#dialog-welcome .recent-list>.item {
+	position: relative;
+	display: inline-block;
+	width: 100px;
+	height: 100px;
+	background-color: transparent;
+	cursor: pointer;
+	margin: 3px;
+	padding: 0;
+}
+#dialog-welcome .recent-list>.item.deleting {
+	outline: 2px solid white;
+}
+#dialog-welcome .recent-list>.item>img {
+	max-width: 100%;
+	max-height: 100%;
+}
+/* shadow when loading without broken icon, will be empty if no support for :has */
+#dialog-welcome .recent-list>.item:has(img:not([src])):before {
+	content: " ";
+	display: block;
+	width: 100%;
+	height: 100%;
+	box-shadow: inset 0 0 16px #0000004d;
+}
+/* close btn */
+#dialog-welcome .recent-list>.item>button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 3px;
+	margin: 3px;
+	background: none;
+	text-shadow: black 0 0 4px, black 0 0 4px, black 0 0 4px, black 0 0 4px, black 0 0 4px;
+	opacity: 0.7;
+	display: none;
+}
+#dialog-welcome .recent-list>.item:hover>button {
+	display: unset;
+}
+#dialog-welcome .recent-list>.item>button:hover {
+	opacity: 1;
+}
+@media (pointer: coarse) {
+	#dialog-welcome .recent-list>.item>button {
+		display: unset;
+	}
+}
+
+#dialog-mods .body .mod-list {
+	max-height: 18em;
+	overflow-y: auto;
+	width: max-content;
+	padding-right: 0.5em;
+	margin: 0.5em 0 0;
+}
+#dialog-mods .body .mod-list img {
+	width: 1.5em;
+	aspect-ratio: 1;
+	vertical-align: middle;
+}
+#dialog-mods .body .mod-list code {
+	font-size: smaller;
+}
+
+/* item slot */
+dt-item-slot {
+	--slot-rgb: 230 230 230;
+	--slot-alpha: 1;
+	--slot-size: 32px;
+	display: inline-block;
+	background-color: rgb(179 179 179 / var(--slot-alpha));
+	border-radius: 0.1px;
+	min-width: var(--slot-size);
+	height: var(--slot-size);
+	background-size: var(--slot-size);
+	background-repeat: no-repeat;
+	background-position: center;
+	outline: 2px solid rgb(var(--slot-rgb));
+	cursor: pointer;
+	transition: transform 50ms;
+	margin-bottom: -4px;
+	/* prevent transform wiggling */
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+
+dt-item-slot:focus-visible,
+dt-item-slot.open {
+	box-shadow: 0 0 0 4px white;
+	border-radius: 1px;
+}
+
+dt-item-slot.dragover {
+	background-color: rgb(255 255 0 / var(--slot-alpha));
+}
+dt-item-slot.dragging {
+	filter: brightness(0.5);
+}
+
+/* multi item input */
+dt-multi-item-input>span {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+dt-multi-item-input>span>button {
+	margin-top: 0.4em;
+	padding: 2px 8px;
+}
+
+dt-multi-item-input dt-item-slot {
+	margin: 4px;
+}
+
+/* config menu special chips */
+.config-chips>label {
+	vertical-align: middle;
+	outline-style: double !important;
+	outline-width: 4px !important;
+	outline-color: var(--d) !important;
+	padding: 4px !important;
+	margin-left: 0.2em;
+}
+
+.config-chips>label:is(:has(input[type="radio"]:checked), [data-chk]) {
+	outline-style: solid !important;
+	outline-color: var(--a) !important;
+}
+
+dt-filter-mode-input>label,
+dt-pusher-mode-input>label {
+	line-height: 0;
+}
+
+dt-filter-mode-input>label:not(:first-of-type),
+dt-pusher-mode-input>label:not(:first-of-type) {
+	margin-left: 0.7em;
+}
+
+dt-loader-priority-input[name="loader-priority"]>label {
+	line-height: 1em;
+	text-transform: capitalize;
+	outline-style: none !important;
+	outline-width: 2px !important;
+}
+
+dt-loader-priority-input[name="loader-priority"]>label:is(:has(input[type="radio"]:checked), [data-chk]) {
+	outline-style: solid !important;
+}
+
+dt-loader-priority-input[name="loader-priority"]>label:not(:first-of-type) {
+	margin-left: 0.4em;
+}
+
+/* angle, fixed angle and loader point inputs */
+.config-grid {
+	position: relative;
+	display: inline-flex;
+	flex-wrap: wrap;
+	width: 90px;
+	vertical-align: middle;
+	user-select: none;
+	/* prevent scrolling */
+	touch-action: none;
+}
+
+.config-grid>.square {
+	background-color: var(--container-color);
+	width: 30px;
+	height: 30px;
+	border: 1px solid var(--input-border-color);
+	/* required for offsetTop */
+	box-sizing: border-box;
+	cursor: pointer;
+}
+
+.config-grid>.square.empty {
+	visibility: hidden;
+}
+
+.config-grid>.square:hover {
+	background-color: var(--button-hover-color);
+}
+
+.config-grid>.arrow {
+	position: absolute;
+	left: 0;
+	top: 30px;
+	pointer-events: none;
+}
+
+.config-grid>input {
+	vertical-align: middle;
+}
+
+/* dialogs */
+#dialog-container {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	left: 0;
+	top: 0;
+	overflow: hidden;
+	pointer-events: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+dt-dialog {
+	min-width: min(80%, 300px);
+	pointer-events: auto;
+}
+
+/* config menus */
+dt-dialog.config {
+	max-width: 450px;
+}
+
+dt-dialog.config>.body>p {
+	display: flex;
+	gap: 0.3em;
+	align-items: center;
+}
+
+dt-dialog.config.clipboard>.footer {
+	display: none;
+}
+
+dt-dialog.config input[type=number]::-webkit-inner-spin-button,
+dt-dialog.config input[type=number]::-webkit-outer-spin-button {
+	opacity: 1;
+}
+
+dt-dialog.config input[type=number] {
+	width: 80px;
+	vertical-align: middle;
+}
+
+dt-dialog.config input[type=checkbox] {
+	top: 1px;
+}
+
+dt-dialog.config .help-circle {
+	padding: 0 0.5px 1px 0.5px;
+	margin-block: -2px 2px;
+}
+
+/* conditional config menus */
+dt-dialog:is(.config, .shape-picker):not([data-conditional]) :is(.cond-only, .footer>.button-remove-config) {
+	display: none;
+}
+
+dt-dialog:is(.config, .shape-picker)[data-conditional]>.footer>.button-remove-config {
+	margin-right: auto;
+}
+
+dt-dialog:is(.config, .shape-picker)>.footer>.button-paste {
+	margin-left: 4.5px;
+}
+
+dt-dialog.config[data-conditional]>.body>p:not(:last-child) {
+	margin-block-end: 1.2em;
+}
+dt-dialog.config .cb-cond {
+	margin-right: 3em;
+}
+dt-dialog.config[data-conditional].replacement .cb-cond {
+	margin-right: 0.8em;
+}
+
+dt-dialog.config[data-conditional] {
+	--tricb-true: "If";
+	--tricb-false: "If not";
+	--tricb-null: "Ignore";
+}
+
+dt-dialog.config[data-conditional].replacement {
+	--tricb-true: "Overwrite";
+	--tricb-false: "";
+	--tricb-null: "Don't overwrite";
+}
+dt-dialog.config[data-conditional].replacement .cb-cond:is([data-state=null], :not([data-state])):before {
+	display: none;
+}
+
+dt-dialog.config[data-conditional].replacement .cb-cond:after {
+	content: unset;
+}
+
+dt-dialog:is(.config, .shape-picker)[data-conditional].replacement .find-only {
+	display: none !important;
+}
+
+/* item picker */
+dt-dialog.item-picker {
+	max-width: 573px;
+}
+
+dt-dialog.item-picker .items {
+	overflow-y: auto;
+	height: 345px;
+	margin-block-end: 0.9em;
+	padding: 1px;
+}
+
+dt-dialog.item-picker dt-item-slot {
+	margin: 4px;
+}
+
+dt-dialog.item-picker dt-item-slot:hover {
+	transform: scale(1.18);
+}
+
+dt-dialog.item-picker dt-item-slot:focus-visible {
+	box-shadow: 0 0 2px 5px white;
+}
+
+dt-dialog.item-picker .items>dt-item-slot.hidden {
+	display: none;
+}
+
+dt-dialog.item-picker .history>dt-item-slot {
+	vertical-align: middle;
+}
+
+/* shape picker */
+dt-dialog.shape-picker {
+	max-width: 573px;
+}
+
+dt-dialog.shape-picker.clipboard>.footer {
+	display: none;
+}
+
+dt-dialog.shape-picker .shapes {
+	overflow-y: auto;
+	margin-block-end: 0.9em;
+	padding: 1px;
+	line-height: 0;
+}
+
+dt-dialog.shape-picker .shapes>[data-shape] {
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	border: 1px solid var(--input-border-color);
+	margin: 1px;
+	cursor: pointer;
+}
+
+dt-dialog.shape-picker .shapes>[data-shape]::before {
+	content: "";
+	display: block;
+	height: 100%;
+	background-color: white;
+	clip-path: polygon(var(--v));
+}
+
+dt-dialog.shape-picker .shapes>[data-shape]:hover::before,
+dt-dialog.shape-picker .shapes>[data-shape].selected::before {
+	background-color: yellow;
+}
+
+dt-dialog.shape-picker .shapes>[data-shape]:focus-visible {
+	outline: 1px solid yellow;
+}
+
+/* item mat list, build order */
+table td>img {
+	vertical-align: middle;
+	width: 24px;
+	height: 24px;
+}
+table td>img[data-stretch] {
+	scale: 1.2;
+}
+table th,
+table td {
+	padding: 0.41rem 0.85rem;
+	text-align: center;
+}
+table td:nth-child(2),
+table td:nth-child(3) {
+	font-family: monospace;
+}

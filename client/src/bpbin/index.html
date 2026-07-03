@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base href="/bpbin/">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Blueprint storing and sharing service for the Deep Space Airships (drednot.io/Dredark) game.">
+	<meta name="twitter:card" content="summary">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Blueprint Bin - DSA Tools">
+	<meta property="og:description" content="Store and share blueprints with ease.">
+	<meta property="theme-color" content="#1f80b1">
+	<title>New - Blueprint Bin</title>
+	<link rel="manifest" href="/app.webmanifest">
+	<script type="module" src="/assets/sw-reg.js"></script>
+	<link rel="apple-touch-icon" href="/assets/icons/180a.png">
+	<link rel="icon" href="/assets/icons/144.svg" type="image/svg+xml">
+	<link rel="stylesheet" href="/main.css" type="text/css">
+</head>
+<body>
+	<header></header>
+	<main class="container-grid">
+		<div class="card">
+			<p><a href="./stats"><b>Statistics</b></a></p>
+			<hr>
+			<p class="smaller">Blueprint storing and sharing service.</p>
+			<p class="smaller">ALPHA VERSION ⚠️ All stored blueprints will be deleted once the app is out of alpha. Feedback is welcome.</p>
+		</div>
+		<div class="card">
+			<h2>New Post</h2>
+			<p>Post a blueprint to share with others.</p>
+			<form id="form-post">
+				<h4>Title</h4>
+				<p class="smaller">Please avoid including width/height here, it will be displayed by the app.</p>
+				<p>
+					<input id="title" maxlength="128" placeholder="Short and descriptive title" required>
+				</p>
+				<h4>Description</h4>
+				<p class="smaller">Optional, supports Markdown.</p>
+				<p>
+					<textarea id="desc" rows="3" maxlength="32768" placeholder="## Features&#10;- *foo* **bar**"></textarea>
+				</p>
+				<h4>Blueprint String</h4>
+				<p>
+					<textarea id="bp" name="bp" rows="6" required minlength="3" placeholder="DSA:..." spellcheck="false"></textarea>
+				</p>
+				<p>
+					<input type="button" id="button-submit" value="Create">
+					<span id="error"></span>
+				</p>
+			</form>
+		</div>
+		<div class="card">
+			<h5>
+				Short Terms
+			</h5>
+			<ul class="smaller">
+				<li>Completely anonymous; only the data you enter is stored, with no personally identifiable information.</li>
+				<li>The stored data may be altered or deleted at any time for any reason.</li>
+				<li>The blueprints are not publicly listed but can be accessed with their link.</li>
+				<li>Users cannot edit or delete their own blueprints, but it is a planned feature.</li>
+			</ul>
+		</div>
+	</main>
+	<footer></footer>
+	<script type="module">
+		const credits = `by <a href='https://github.com/Blueyescat' target='_blank'>Blueyescat</a>.`
+
+		import { loadHF } from "/main.js"
+		loadHF(credits, "Blueprint Bin")
+
+		const form = document.getElementById("form-post"),
+			submitButton = document.getElementById("button-submit"),
+			descTitle = document.getElementById("title"),
+			descInput = document.getElementById("desc"),
+			bpInput = document.getElementById("bp"),
+			error = document.getElementById("error")
+
+		submitButton.addEventListener("click", async () => {
+			if (!form.reportValidity() || submitButton.classList.contains("disabled")) return
+
+			error.innerHTML = `<span style="color: var(--blue);">Please wait while the server is processing...</span>`
+			document.body.classList.add("processing")
+			submitButton.classList.add("disabled")
+			const res = await fetch("./new", {
+				method: "POST",
+				body: JSON.stringify({
+					title: descTitle.value,
+					desc: descInput.value,
+					str: bpInput.value
+				})
+			}).catch(console.error)
+			error.textContent = ""
+			document.body.classList.remove("processing")
+			submitButton.classList.remove("disabled")
+
+			if (res == null)
+				return error.textContent = "Network error. Please check your connection."
+			if (res.status == 429)
+				return error.textContent = "Too many requests. Please try again a few seconds later."
+			if (res.status == 400)
+				return error.textContent = (await res.json()).error
+			if (!res.ok)
+				return error.textContent = "Unexpected error."
+
+			window.location.href = "./" + (await res.json()).id
+		})
+
+		bpInput.addEventListener("focus", () => bpInput.select())
+		bpInput.addEventListener("dblclick", () => bpInput.select())
+	</script>
+	<script type="module" src="/assets/goatc.js"></script>
+	<style>
+		html {
+			height: 100%;
+		}
+
+		body {
+			height: 100%;
+		}
+
+		body.processing,
+		body.processing * {
+			cursor: wait !important;
+		}
+
+		#error {
+			color: #D8000C;
+		}
+
+		#desc,
+		#title {
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		#bp {
+			width: 100%;
+			box-sizing: border-box;
+			font-size: 0.85em;
+		}
+
+		#button-submit {
+			font-size: 1.1em;
+			line-height: 1.7em;
+		}
+
+		form h4 {
+			padding-top: 0.4em;
+			margin-block-end: 0.5em;
+		}
+	</style>
+</body>
+</html>

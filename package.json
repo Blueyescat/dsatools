@@ -7,23 +7,32 @@
   "author": "Blueyescat <blueyescat123@gmail.com>",
   "license": "GPL-3.0-only",
   "type": "module",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
   "scripts": {
-    "build": "node build",
-    "start": "node build -w"
+    "lint": "eslint .",
+    "typecheck": "tsc -p server --noEmit && tsc -p client --noEmit",
+    "build": "npm run build --workspaces",
+    "start": "npm run start -w server",
+    "dev": "concurrently \"npm run dev -w client\" \"npm run dev -w server\""
   },
   "dependencies": {
-    "dsabp-js": "^0.4.0",
-    "pica": "^9.0.1",
-    "zoomist": "^2.0.11"
+    "@napi-rs/canvas": "^0.1.77",
+    "concurrently": "^9.2.3",
+    "dsabp-js": "^0.4.13",
+    "dsabp-js-img": "^0.1.0",
+    "ejs": "^3.1.10",
+    "isomorphic-dompurify": "^2.26.0",
+    "marked": "^15.0.11"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.9.0",
-    "@typescript-eslint/parser": "^6.15.0",
-    "ejs": "^3.1.9",
-    "esbuild": "^0.19.10",
-    "eslint": "^8.56.0",
-    "html-minifier-terser": "^7.2.0",
-    "typescript": "^5.3.3"
+    "@types/ejs": "^3.1.5",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2"
   }
 }

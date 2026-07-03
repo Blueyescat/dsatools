@@ -1,0 +1,25 @@
+{
+  "name": "dsatools-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/**/*.ts --outdir=dist --platform=node --format=esm",
+    "start": "cross-env UWS_HTTP_MAX_HEADERS_SIZE=16384 node dist/index.js",
+    "dev": "cross-env UWS_HTTP_MAX_HEADERS_SIZE=16384 tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@geckos.io/server": "^3.0.2",
+    "cloudinary": "^2.7.0",
+    "dotenv": "^16.5.0",
+    "hyper-express": "^6.17.3",
+    "hyper-express-rate-limit": "^7.1.5",
+    "live-directory": "^3.0.3",
+    "lmdb": "^3.4.2",
+    "secure-json-parse": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.12",
+    "cross-env": "^10.1.0",
+    "tsx": "^4.20.5"
+  }
+}

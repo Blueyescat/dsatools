@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["src"],
+  "allowJs": true,
+  "compilerOptions": {
+    "lib": ["es2023", "DOM", "DOM.Iterable", "WebWorker"],
+    "types": [],
+    "paths": {
+      "/*": ["./src/*"]
+    }
+  }
+}

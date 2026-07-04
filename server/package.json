@@ -13,7 +13,6 @@
     "dotenv": "^16.5.0",
     "hyper-express": "^6.17.3",
     "hyper-express-rate-limit": "^7.1.5",
-    "live-directory": "^3.0.3",
     "lmdb": "^3.4.2",
     "secure-json-parse": "^4.0.0"
   },

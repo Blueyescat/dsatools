@@ -4,10 +4,10 @@ import "dotenv/config"
 import { BuildCmd, ConfigCmd, decode, Item, PREFIX } from "dsabp-js"
 import { BpRenderer, setImagesPath } from "dsabp-js-img"
 import { renderFile as ejsFile } from "ejs"
+import { createReadStream, Stats, statSync } from "fs"
 import { express as hyperexpress, Response } from "hyper-express"
 import { rateLimit } from "hyper-express-rate-limit"
 import DOMPurify from "isomorphic-dompurify"
-import LiveDirectory from "live-directory"
 import { open as lmdb } from "lmdb"
 import { parse as marked } from "marked"
 import { dirname, join } from "path"
@@ -302,25 +302,41 @@ server.post("/bpbin/new",
 	}
 )
 
-const publicDir = new LiveDirectory(abs("../../client/dist/"), {
-	static: false,
-	cache: { max_file_count: 0, max_file_size: 0 }
-})
+const publicDir = abs("../../client/dist/")
 server.get("/*", (req, res) => {
-	const path = req.path.substring(1),
-		file = publicDir.get(path + (req.path.includes(".") ? "" : `${path.endsWith("/") ? "" : "/"}index.html`))
+	let reqPath = req.path.substring(1)
+	if (!reqPath.includes("."))
+		reqPath += `${reqPath.endsWith("/") || reqPath == "" ? "" : "/"}index.html`
 
-	if (!file)
+	const filePath = join(publicDir, reqPath)
+	if (!filePath.startsWith(publicDir))
+		return res.status(403).send()
+
+	let stats: Stats
+	try {
+		stats = statSync(filePath)
+	} catch {
 		return res.status(404).send()
+	}
 
-	const parts = file.path.split("."),
-		ext = parts[parts.length - 1]
+	res.type(filePath).header("Access-Control-Allow-Origin", "*")
 
-	res.type(ext).header("Access-Control-Allow-Origin", "*")
+	const size = stats.size
+	const range = req.headers.range
+	if (range) {
+		const match = range.match(/^bytes=(\d*)-(\d*)$/)
+		if (!match)
+			return res.status(416).send()
+		const start = match[1] ? parseInt(match[1]) : 0
+		const end = match[2] ? parseInt(match[2]) : size - 1
+		if (start >= size || end >= size || start > end)
+			return res.status(416).header("Content-Range", `bytes */${size}`).send()
 
-	return file.cached
-		? res.send(file.content)
-		: res.stream(file.stream(), file.stats.size)
+		res.status(206).header("Content-Range", `bytes ${start}-${end}/${size}`)
+		return res.stream(createReadStream(filePath, { start, end }), end - start + 1)
+	}
+
+	return res.stream(createReadStream(filePath), size)
 })
 
 await server.listen(PORT)

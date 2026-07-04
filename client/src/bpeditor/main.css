@@ -723,24 +723,6 @@ dt-loader-priority-input[name="loader-priority"]>label:not(:first-of-type) {
 }
 
 /* dialogs */
-#dialog-container {
-	position: absolute;
-	width: 100vw;
-	height: 100vh;
-	left: 0;
-	top: 0;
-	overflow: hidden;
-	pointer-events: none;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-dt-dialog {
-	min-width: min(80%, 300px);
-	pointer-events: auto;
-}
-
 /* config menus */
 dt-dialog.config {
 	max-width: 450px;

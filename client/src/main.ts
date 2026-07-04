@@ -1,3 +1,6 @@
+import { Dialog } from "./Dialog.js"
+Dialog.defaultParent = document.getElementById("dialog-container")
+
 export const usesTouch = matchMedia("(pointer: coarse)").matches && !matchMedia("(pointer: fine)").matches
 
 export const pointerEvent = {

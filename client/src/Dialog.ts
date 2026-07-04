@@ -45,7 +45,7 @@ if (!usesTouch)
 	})
 
 // local storage
-const toolid = globalThis.toolPath.split("/").pop(),
+const toolid = globalThis.toolPath?.split("/").pop() ?? "main",
 	strgKey = "dsatools_dialogs-" + toolid,
 	strgKeyDragPos = "pos"
 

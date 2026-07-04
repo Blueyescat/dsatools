@@ -767,7 +767,22 @@ input[type="checkbox"].tricb[data-state=false]:before {
 }
 
 /* Dialog */
+#dialog-container {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	left: 0;
+	top: 0;
+	overflow: hidden;
+	pointer-events: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 dt-dialog {
+	min-width: min(80%, 300px);
+	pointer-events: auto;
 	display: none;
 	position: absolute;
 	background-color: var(--body-color);

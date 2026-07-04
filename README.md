@@ -1,5 +1,5 @@
 # DSA Tools
-A website and PWA for various tools for the Deep Space Airships game ([drednot.io](https://drednot.io)).
+A website (PWA) for various tools for the Deep Space Airships game ([drednot.io](https://drednot.io)).
 
 ### Issues / Bugs
 Create a detailed issue in the [Issues](https://github.com/Blueyescat/dsatools/issues) page.

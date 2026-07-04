@@ -9,6 +9,7 @@ navigator.serviceWorker?.register("/sw.js", { scope: "/" }).then(reg => {
 			toggleThrobber(first ? "" : "Downloading app update,\npage will reload!", true)
 		reg.installing.addEventListener("statechange", e => {
 			if (e.target.state != "activating") return
+			sessionStorage.setItem("dsatools_showChangelog", "1")
 			// reload to apply update only if the page was just loaded, since a diff page may cause update
 			if (first || (Date.now() - start <= 20000 && !location.pathname.startsWith("/items")))
 				return window.reloadingToUpdate = true, location.reload()

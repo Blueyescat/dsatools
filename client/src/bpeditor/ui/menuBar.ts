@@ -4,7 +4,7 @@ import { resetZoom, setLastCopiedBpStr } from "../main.js"
 import { resetSessionId } from "../managers/webStorage.js"
 import { editorMap, winMan } from "./uiMain.js"
 import { Dialog } from "/Dialog.js"
-import { elByCls, trigger } from "/main.js"
+import { elByCls, trigger, showChangelog } from "/main.js"
 import { toast } from "/Toast.js"
 
 /* FIND REPLACE */
@@ -242,7 +242,7 @@ const dialogGuide = new Dialog({
 				e.preventDefault()
 				if (a.hash) dialog.elBody.scrollTo({
 					top: Array.from<HTMLHeadingElement>(dialog.querySelectorAll("h1,h2,h3,h4,h5,h6"))
-						.find(el => el.textContent.toLowerCase().startsWith(a.hash.substring(1).toLowerCase().replaceAll("+", " "))).offsetTop
+						.find(el => el.textContent.toLowerCase().startsWith(a.hash.slice(1).toLowerCase().replaceAll("+", " "))).offsetTop
 				})
 			})
 		})
@@ -254,6 +254,9 @@ const dialogGuide = new Dialog({
 	}
 })
 document.getElementById("button-menu-guide").addEventListener("click", () => dialogGuide.open())
+
+/* CHANGELOG */
+document.getElementById("button-menu-changelog").addEventListener("click", showChangelog)
 
 /* MODS */
 const dialogMods = new Dialog({

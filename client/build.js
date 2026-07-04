@@ -1,4 +1,5 @@
 import { context, build as esbuild, formatMessages } from "esbuild"
+import { watch as fsWatch } from "fs"
 import { readFile, readdir, rename, rm, writeFile } from "fs/promises"
 import { minify as minifyHtml } from "html-minifier-terser"
 import DOMPurify from "isomorphic-dompurify"
@@ -50,6 +51,8 @@ const srcCtx = await context({
 		".webp": "copy",
 		".svg": "copy",
 		".md": "copy",
+		".mp4": "copy",
+		".gif": "copy",
 	},
 	outdir: outDir,
 	logLevel: "silent",
@@ -62,14 +65,6 @@ const srcCtx = await context({
 	sourcemap,
 	plugins: [mdToHtmlPl(), swCheckPl(), resolvePackagesPl(), minifyHtmlPl(), buildWithLogsPl()]
 })
-
-if (watch) {
-	console.info(time(), "watching for changes\n")
-	await srcCtx.watch()
-} else {
-	await srcCtx.rebuild()
-	process.exit(0)
-}
 
 //
 
@@ -92,7 +87,7 @@ async function updateSwCacheUrls() {
 
 	const patterns = [
 		{ path: "/", exclude: "assets lib sw.ts", recursive: false, folders: true },
-		{ path: "/assets/", recursive: true },
+		{ path: "/assets/", exclude: "changelog/", recursive: true },
 		{ path: "/img2pixar/", recursive: true },
 		{ path: "/bpbin/", recursive: false },
 		{ path: "/bptools/", recursive: true },
@@ -102,14 +97,22 @@ async function updateSwCacheUrls() {
 
 	const paths = []
 	for (const pattern of patterns) {
-		const exclude = pattern.exclude ? new Set(pattern.exclude.split(" ")) : null
+		const exclude = pattern.exclude ? pattern.exclude.split(" ") : null
 		for (const file of await readdir(outDir + pattern.path, { withFileTypes: true, recursive: pattern.recursive, encoding: "utf8" }).catch(() => { }) ?? []) {
 			if (!pattern.folders && !file.isFile())
 				continue
 			const name = file.name
-			if (name == "index.html" || name.endsWith(".ejs") || name.endsWith(".map") || exclude?.has(name))
-				continue
 			const path = file.path.replaceAll(/\\\\?|\/\//g, "/").replaceAll(/^\.?\/?dist\/|\/$/g, "") // recursive:true returns different
+			const basePath = pattern.path.slice(1)
+			const fullPath = (path != "" ? path + "/" : "") + name
+			if (name == "index.html" || name.endsWith(".ejs") || name.endsWith(".map")
+				|| exclude?.some(x =>
+					x.endsWith("/")
+						? fullPath.startsWith(basePath + x)
+						: x == name
+				)
+			)
+				continue
 			paths.push({ parent: (path != "" ? path + "/" : ""), file: name })
 		}
 	}
@@ -252,6 +255,8 @@ function buildWithLogsPl() {
 						await formatMessages(result.warnings, { kind: "warning", color: true }).then(strings => console.warn(strings.join("\n").trim()))
 				}
 
+				await generateChangelog()
+
 				console.info(time(), (watch ? "[watch] " : "")
 					+ `${result.errors.length ? "\x1b[31mBUILD FAILED" : "\x1b[32mBuilt"}\x1b[0m with`
 					+ ` ${result.warnings.length} warnings${result.errors.length ? ` ${result.errors.length} errors` : ""}`)
@@ -283,4 +288,73 @@ function mdToHtmlPl() {
 
 function time() {
 	return new Date().toLocaleTimeString()
+}
+
+/* changelog */
+const CHANGELOG_HTML = /*html*/`<!DOCTYPE html><html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Changelog</title>
+	<link rel="stylesheet" href="/main.css">
+</head>
+<body style="background: unset;">
+	<div class="container-grid"><!--entries--></div>
+	<script>
+		for (const el of document.querySelectorAll("time"))
+			el.textContent = new Date(el.getAttribute("datetime")).toLocaleDateString()
+	</script>
+</body>
+</html>`
+
+async function generateChangelog() {
+	let firstDate
+	const entries = []
+	for (let section of
+		(await readFile("../changelog.md", "utf8"))
+			.split(/^---\s*$/m).map(s => s.trim())
+	) {
+		let date = null
+		// extract date and remove it
+		section = section.replace(/(\d{4}-\d{2}-\d{2})/, (_, d) => {
+			return date = d, ""
+		})
+		if (date) firstDate ??= date
+
+		// convert remaining dates
+		section = section.replace(/\d{4}-\d{2}-\d{2}/g, d => `<time datetime="${d}"></time>`)
+
+		// append date into heading or create one
+		const lines = section.split(/\r?\n/)
+		const firstLine = lines[0]?.trim()
+		if (firstLine?.match(/^(#{1,6})\s+/))
+			lines[0] = firstLine + ` (<time datetime="${date}"></time>)`
+		else
+			lines.unshift(`### <time datetime="${date}"></time>`)
+
+		entries.push(DOMPurify.sanitize(
+			marked.parse(lines.join("\n").trim())
+
+		).replaceAll("<a href", "<a target=\"_blank\" href"))
+	}
+
+	await writeFile(pathM.join(outDir, "changelog.html"),
+		`<!--${firstDate}-->` + CHANGELOG_HTML.replace("<!--entries-->",
+			entries.map(html => `<div class="card">${html}</div>`).join("\n")
+		)
+	)
+}
+
+//
+if (watch) {
+	console.info(time(), "watching for changes\n")
+	await srcCtx.watch()
+	let changelogTimer
+	fsWatch("../changelog.md", () => {
+		clearTimeout(changelogTimer)
+		changelogTimer = setTimeout(() => srcCtx.rebuild(), 100)
+	})
+} else {
+	await srcCtx.rebuild()
+	process.exit(0)
 }

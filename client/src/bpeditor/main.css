@@ -509,6 +509,9 @@ header {
 	border-radius: 6px;
 	border: 1px solid var(--button-active-color);
 }
+#dialog-guide>.body :is(h2, h3)>code {
+	vertical-align: middle;
+}
 #dialog-guide>.body h2,
 #dialog-guide>.body h3,
 #dialog-guide>.body h4 {

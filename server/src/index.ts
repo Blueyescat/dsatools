@@ -10,7 +10,7 @@ import { rateLimit } from "hyper-express-rate-limit"
 import DOMPurify from "isomorphic-dompurify"
 import { open as lmdb } from "lmdb"
 import { parse as marked } from "marked"
-import { dirname, join } from "path"
+import { dirname, extname, join } from "path"
 import sjson from "secure-json-parse"
 import { Readable } from "stream"
 import { fileURLToPath } from "url"
@@ -304,7 +304,7 @@ server.post("/bpbin/new",
 
 const publicDir = abs("../../client/dist/")
 server.get("/*", (req, res) => {
-	let reqPath = req.path.substring(1)
+	let reqPath = req.path.slice(1)
 	if (!reqPath.includes("."))
 		reqPath += `${reqPath.endsWith("/") || reqPath == "" ? "" : "/"}index.html`
 
@@ -319,7 +319,8 @@ server.get("/*", (req, res) => {
 		return res.status(404).send()
 	}
 
-	res.type(filePath).header("Access-Control-Allow-Origin", "*")
+	res.type(extname(filePath).slice(1))
+		.header("Access-Control-Allow-Origin", "*")
 
 	const size = stats.size
 	const range = req.headers.range

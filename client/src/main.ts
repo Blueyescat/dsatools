@@ -42,6 +42,44 @@ export function loadHF(credits?: string, title = document.title) {
 	return { header: elHeader, footer: elFooter }
 }
 
+export function showChangelog() {
+	new Dialog({
+		title: "<h3>Changelog</h3>",
+		backdrop: true,
+		body: /*html*/`
+			<iframe src="/changelog.html" frameborder="0" style="width: 100%; height: 100%;"
+				onload="new ResizeObserver(()=>this.style.height=this.contentWindow.document.documentElement.scrollHeight+'px').observe(this.contentWindow.document.body)"
+			></iframe>
+		`,
+		footer: { closeButton: "Close" },
+		removeOnClose: true,
+		closeWhenClickedOutside: true,
+		onCreate(dialog) {
+			dialog.style.position = "fixed"
+			dialog.style.width = "100%"
+			dialog.style.maxWidth = "var(--page-width)"
+			dialog.style.maxHeight = "80vh"
+		},
+	}).open()
+
+	fetch("/changelog.html?noCache", { headers: { Range: "bytes=4-13" } })
+		.then(r => r.text())
+		.then(t => localStorage.setItem("dsatools_viewedChangelog", t))
+}
+
+document.getElementById("button-changelog")?.addEventListener("click", showChangelog)
+
+const viewedChangelog = localStorage.getItem("dsatools_viewedChangelog")
+if (navigator.serviceWorker.controller && (!viewedChangelog || sessionStorage.getItem("dsatools_showChangelog"))) {
+	sessionStorage.removeItem("dsatools_showChangelog")
+	// show if new changelog or hasn't viewed any
+	if (viewedChangelog)
+		fetch("/changelog.html?noCache", { headers: { Range: "bytes=4-13" } })
+			.then(r => r.text())
+			.then(t => viewedChangelog != t && showChangelog())
+	else showChangelog()
+}
+
 /* Dropdowns */
 const openDropdowns = new Set<HTMLElement>(),
 	selFocusables = ":is(button, a)",

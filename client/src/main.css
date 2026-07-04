@@ -553,6 +553,7 @@ header {
 	color: inherit;
 	text-decoration: none;
 	font-size: smaller;
+	font-family: Arial;
 }
 
 .dropdown li.dropdown-trigger>:is(button, a):after {

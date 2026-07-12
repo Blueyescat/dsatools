@@ -1,4 +1,4 @@
-Blueprint Editor is an app allowing to design DSA ships/blueprints with various features. It can work offline (see the [main page of DSA Tools](/) for details) and it supports touch screens.
+Blueprint Editor is an app allowing to design DSA ships/blueprints with various features. It can work offline (see the [homepage](/) for details) and it supports touch screens.
 
 This guide also acts as a list of features and it doesn't go into the details that you will encounter when using the app.
 
@@ -94,6 +94,7 @@ Export the current blueprint/map as an image, with many options. Access via the 
 - Leaving the page while there is anything in the undo/redo history will display the browser's confirmation dialog. The BP is automatically saved to recent maps but the history is not.
 - The `List of Items & Materials` window displays list of contents and BoM for the current map or the export tool. Can be opened from the `View` menu for the map, or from the [Blueprint String Window](#Blueprint+String+Window).
 - `/bpeditor?load=<bp-string>` can be used to load the BP string from the URL.
+- Changelog is in the `More` menu.
 
 ### Other Keyboard Shortcuts
 - `Ctrl+S`: Copy blueprint string for the current map.
@@ -103,9 +104,6 @@ Export the current blueprint/map as an image, with many options. Access via the 
 - `C`: Reset map zoom.
 - `Ctrl+C/V`: Copy or paste the configuration of the object being hovered over. Note: It may conflict with copying and pasting objects.
 - Hold <code class="slashkey"></code>: Show FPS, tile coordinates and some debug information.
-
-### Other Information
-- Changelogs are posted in [the forum thread](https://discord.com/channels/266495196622094336/1037928446938062860) in [the game's Discord server](https://discord.gg/bZF4myU).
 
 #### Known Issues
 - Wall placement is wrong in some cases when loading blueprints.

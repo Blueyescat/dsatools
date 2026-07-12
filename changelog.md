@@ -56,7 +56,7 @@ Open-sourced changes since 2023-12-04.
 ---
 
 ### 2026-11-29
-**Blueprint Editor**: `/bpeditor?load=<bp-string>` can be used to load the BP string from the URL. Mainly used for linking to the editor from the BP scanner menu by the [Simple Dredark Tools](https://discord.com/channels/266495196622094336/1037923108004315196) browser extension.
+**Blueprint Editor**: `/bpeditor?load=<bp-string>` can be used to load the BP string from the URL. Mainly used for linking to the editor from the BP scanner menu by the [Simple Dredark Tools](https://github.com/Blueyescat/Simple-Dredark-Tools) browser extension.
 
 ---
 

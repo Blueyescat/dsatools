@@ -209,6 +209,7 @@ header {
 	background-color: var(--container-color);
 	width: 100%;
 	box-sizing: border-box;
+	z-index: 997;
 }
 
 /* #options-bar {

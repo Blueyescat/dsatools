@@ -7,18 +7,24 @@ import { marked } from "marked"
 import pathM from "path"
 
 const watch = process.argv.includes("-w"),
-	srcDir = "./src/", // these has to have /x/ for md plugin
+	srcDir = "./src/",
 	outDir = "./dist/",
 	libDir = "/lib/",
-	outLibDir = outDir.slice(0, -1) + libDir,
+	outLibDir = pathM.join(outDir, libDir),
+	minify = !watch,
+	sourcemap = true,
 
+	// html files aren't scanned, manually add here to allow link tags with lib/
 	externals = new Set(["zoomist/css"]),
-	noBundle = ["pixi.js", "dsabp-js"] // pixi won't be bundled in pixi-viewport, same for dsabp-js/img
+	// keep bundled with their importer instead of separate files (not a must-have, decreases web requests)
+	keepBundled = [
+		"@geckos.io/common/lib/",
+		"@yandeu/events" // used by geckos client
+	],
+	// only exports actually imported (from src/ or other packages) get pulled into dist/lib/
+	treeShakenLibs = ["pixi.js"]
 
-const minify = true
-const sourcemap = true
-
-/** @type import("html-minifier-terser").Options */
+/** @type {import("html-minifier-terser").Options} */
 const htmlOptions = {
 	collapseWhitespace: true,
 	conservativeCollapse: true,
@@ -32,13 +38,22 @@ const htmlOptions = {
 	sortClassName: true
 }
 
-let paused
+/** @type {import("esbuild").BuildOptions} */
+const commonBuildOptions = {
+	target: "es2022",
+	supported: { "class-static-blocks": false },
+	format: "esm",
+	platform: "browser",
+	bundle: true,
+	minify
+}
 
-console.info(time(), "cleaning")
+console.info(time(), "Cleaning")
 for (const file of await readdir(outDir).catch(() => { }) ?? [])
 	await rm(pathM.join(outDir, file), { recursive: true })
 
 const srcCtx = await context({
+	...commonBuildOptions,
 	packages: "external",
 	entryPoints: [`${srcDir}**`],
 	loader: {
@@ -56,33 +71,74 @@ const srcCtx = await context({
 	},
 	outdir: outDir,
 	logLevel: "silent",
-	supported: { "class-static-blocks": false },
-	target: "es2022",
-	format: "esm",
-	platform: "browser",
-	bundle: true,
-	minify,
 	sourcemap,
-	plugins: [mdToHtmlPl(), swCheckPl(), resolvePackagesPl(), minifyHtmlPl(), buildWithLogsPl()]
+	plugins: [buildStartLogPl(), mdToHtmlPl(), resolvePackagesPl(), ...(watch ? [] : [minifyHtmlPl()]), buildWithLogsPl()]
 })
 
 //
 
-function swCheckPl() {
+function buildStartLogPl() {
 	return {
-		name: "swCheck",
+		name: "buildStartLog",
+		/** @param {import("esbuild").PluginBuild} build */
 		setup(build) {
-			build.onStart(() => {
-				if (paused) {
-					paused = false; throw "stop"
-				}
-				console.info(time(), (watch ? "[watch] " : "") + "Building...")
-			})
+			build.onStart(() => console.info(time(), (watch ? "[watch] " : "") + "Building..."))
 		}
 	}
 }
 
-async function updateSwCacheUrls() {
+// scans src (and extra files) for imports from target lib and returns the export names
+async function getUsedExports(lib, extraFiles = new Set()) {
+	// get runtime exports
+	const { metafile } = await esbuild({
+		stdin: { contents: `export * from "${lib}"`, resolveDir: srcDir },
+		bundle: true,
+		write: false,
+		format: "esm",
+		platform: "browser",
+		metafile: true
+	})
+	const exports = new Set(Object.values(metafile.outputs)[0].exports)
+
+	const escapedLib = lib.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+	const s = `\\s*`
+	const fromLib = `${s}from${s}["']${escapedLib}["']`
+	const namedRegex = new RegExp(`import${s}\\{([^}]+)\\}${fromLib}`, "g") // import {}
+	const defaultRegex = new RegExp(`import\\s+\\w+${s}(?:,${s}\\{[^}]*\\})?${fromLib}`) // import x | import x, {}
+	const namespaceRegex = new RegExp(`import${s}\\*${s}as\\s+\\w+${fromLib}`) // import * as x
+
+	const names = new Set()
+
+	const scanFile = async (filePath, displayName) => {
+		const contents = await readFile(filePath, "utf8")
+
+		if (namespaceRegex.test(contents) || defaultRegex.test(contents))
+			throw `default/* ${lib} import in ${displayName} not allowed`
+
+		for (const [, imports] of contents.matchAll(namedRegex))
+			for (const name of imports.split(",").map(s => s.trim().split(/\s+as\s+/)[0]))
+				if (name == "default")
+					throw `"default as" ${lib} import in ${displayName} not allowed`
+				else if (exports.has(name))
+					names.add(name)
+	}
+
+	for (const file of await readdir(srcDir, { withFileTypes: true, recursive: true })) {
+		if (!file.isFile() || !/\.(js|ts)$/.test(file.name))
+			continue
+		await scanFile(pathM.join(file.path, file.name), file.name)
+	}
+
+	for (const path of extraFiles) {
+		if (!/\.(js|ts|mjs|cjs)$/.test(path))
+			continue
+		await scanFile(path, pathM.relative(process.cwd(), path))
+	}
+
+	return [...names].sort()
+}
+
+async function generateSwContent() {
 	const manuals = ["/", "https://dt.tmp.bz/p?https://pub.drednot.io/test/econ/item_schema.json"]
 
 	const patterns = [
@@ -98,13 +154,15 @@ async function updateSwCacheUrls() {
 	const paths = []
 	for (const pattern of patterns) {
 		const exclude = pattern.exclude ? pattern.exclude.split(" ") : null
-		for (const file of await readdir(outDir + pattern.path, { withFileTypes: true, recursive: pattern.recursive, encoding: "utf8" }).catch(() => { }) ?? []) {
+		for (const file of
+			await readdir(pathM.join(outDir, pattern.path), { withFileTypes: true, recursive: pattern.recursive, encoding: "utf8" }).catch(() => { }) ?? []
+		) {
 			if (!pattern.folders && !file.isFile())
 				continue
 			const name = file.name
-			const path = file.path.replaceAll(/\\\\?|\/\//g, "/").replaceAll(/^\.?\/?dist\/|\/$/g, "") // recursive:true returns different
+			const path = pathM.relative(outDir, file.path).split(pathM.sep).join("/")
 			const basePath = pattern.path.slice(1)
-			const fullPath = (path != "" ? path + "/" : "") + name
+			const fullPath = (path ? path + "/" : "") + name
 			if (name == "index.html" || name.endsWith(".ejs") || name.endsWith(".map")
 				|| exclude?.some(x =>
 					x.endsWith("/")
@@ -137,6 +195,7 @@ async function updateSwCacheUrls() {
 function resolvePackagesPl() {
 	return {
 		name: "resolvePackages",
+		/** @param {import("esbuild").PluginBuild} build */
 		setup(build) {
 			// filter out non-external imports
 			build.onResolve({ filter: /.*/ }, async ({ kind, path, resolveDir, external, importer }) => {
@@ -150,14 +209,21 @@ function resolvePackagesPl() {
 				)
 					return { path, external: true }
 
-				if (external || kind == "entry-point" || (importer.includes("node_modules") && !noBundle.includes(path)))
+				// if a package is importing one of its own files (relative path), or importing something from keepBundled,
+				// keep it bundled/inlined - anything else is split into shared files in /lib/
+				const shouldKeepBundled = keepBundled.some(p =>
+					p.endsWith("/")
+						? path.startsWith(p)
+						: path == p || path.replace(/\.js$/, "") == p.replace(/\.js$/, "")
+				)
+				if (external || kind == "entry-point" || (importer.includes("node_modules") && (/^\.\.?\//.test(path) || shouldKeepBundled)))
 					return
 
 				// collect the import name, and edit the import path
-				if (path != "pixi.js")
+				if (!treeShakenLibs.includes(path))
 					externals.add(path)
 				return {
-					path: libDir + path + (path.endsWith(".js") ? "" : ".js"),
+					path: pathM.posix.join(libDir, path + (path.endsWith(".js") ? "" : ".js")),
 					external: true
 				}
 			})
@@ -178,16 +244,19 @@ function minifyHtmlPl() {
 	const regexHtmlTemplate = /\/\*html\*\/`([\s\S]+?)(?:(?<=^|>|\t)`|`(?=,|]))/gm
 	return {
 		name: "minifyHtml",
+		/** @param {import("esbuild").PluginBuild} build */
 		setup(build) {
 			build.onLoad({ filter: /\.(html|ejs|js|ts)$/ }, async ({ path }) => {
 				let contents = await readFile(path, "utf8")
 
-				if (path.endsWith(".ts") || path.endsWith(".js"))
-					contents = await asyncReplace(contents, regexHtmlTemplate,
-						async (match, html) => "`" + await minifyHtml(html, htmlOptions) + "`"
-					)
-				else
-					contents = await minifyHtml(contents, htmlOptions)
+				if (!watch) {
+					if (path.endsWith(".ts") || path.endsWith(".js"))
+						contents = await asyncReplace(contents, regexHtmlTemplate,
+							async (match, html) => "`" + await minifyHtml(html, htmlOptions) + "`"
+						)
+					else
+						contents = await minifyHtml(contents, htmlOptions)
+				}
 
 				return { contents, loader: "default" }
 			})
@@ -195,58 +264,67 @@ function minifyHtmlPl() {
 	}
 }
 
+/**
+ * bundles and puts externals into outLibDir recursively, supporting nested externals
+ * @returns set of source file paths that got bundled
+ * @param {import("esbuild").BuildResult} result
+ */
+async function bundleExternals(result) {
+	const built = new Set()
+	const srcPaths = new Set()
+	while (externals.size) {
+		const entryPoints = Array.from(externals).filter(p => !built.has(p))
+		externals.clear()
+		entryPoints.forEach(p => built.add(p))
+		const libResult = await esbuild({
+			entryPoints: entryPoints.map(p => ({ in: p, out: p.replace(/\.js$/, "") })),
+			outdir: outLibDir,
+			plugins: [resolvePackagesPl()],
+			metafile: true, // needed to know which real files got bundled in
+			...commonBuildOptions
+		})
+		result.errors.push(...libResult.errors)
+		result.warnings.push(...libResult.warnings)
+
+		for (const input of Object.keys(libResult.metafile.inputs))
+			srcPaths.add(pathM.resolve(input))
+	}
+	return srcPaths
+}
+
 function buildWithLogsPl() {
 	return {
 		name: "buildLogs",
+		/** @param {import("esbuild").PluginBuild} build */
 		setup(build) {
 			build.onEnd(async result => {
-				if (result.errors.find(err => err.text == "stop"))
-					return
+				const libSrcFilePaths = await bundleExternals(result)
 
-				// bundles and puts externals into outLibDir recursively, supporting nested externals
-				const common = {
-					target: "es2022",
-					supported: { "class-static-blocks": false },
-					format: "esm",
-					platform: "browser",
-					bundle: true,
-					minify
-				}
-				const built = new Set()
-				while (externals.size) {
-					const entryPoints = Array.from(externals).filter(p => !built.has(p))
-					externals.clear()
-					entryPoints.forEach(p => built.add(p))
+				for (const lib of treeShakenLibs) {
 					const libResult = await esbuild({
-						entryPoints,
-						outdir: outLibDir,
-						plugins: [resolvePackagesPl()],
-						...common
+						stdin: {
+							contents: watch
+								? `export * from '${lib}'`
+								// re-export only actually used exports, scanning src
+								// and libSrcFilePaths so e.g. pixi-viewport's imports from pixi.js are included
+								: `export{${(await getUsedExports(lib, libSrcFilePaths)).join(",")}}from'${lib}'`,
+							resolveDir: srcDir
+						},
+						outfile: pathM.join(outLibDir, lib.endsWith(".js") ? lib : lib + ".js"),
+						...commonBuildOptions
 					})
 					result.errors.push(...libResult.errors)
 					result.warnings.push(...libResult.warnings)
 				}
-				// TODO: try find a nicer way to tree shake while separating
-				const libResult = await esbuild({
-					stdin: {
-						contents: "export{TilingSprite,Application,Assets,BitmapText,ColorMatrixFilter,Container,EventEmitter,Filter,GlProgram,GpuProgram,Graphics,Point,Rectangle,Sprite,Texture,Ticker}from'pixi.js'",
-						resolveDir: srcDir
-					},
-					outfile: `${outDir}lib/pixi.js`,
-					...common
-				})
 
-				const swContent = await updateSwCacheUrls()
 				const swResult = await esbuild({
-					stdin: { contents: swContent, loader: "ts" },
-					outfile: `${outDir}sw.js`,
-					...common
+					stdin: { contents: await generateSwContent(), loader: "ts" },
+					outfile: pathM.join(outDir, "sw.js"),
+					...commonBuildOptions
 				})
-				paused = true
-				await writeFile(`${srcDir}sw.ts`, swContent).then(() => setTimeout(() => paused = false, 800))
 
-				result.errors.push(...libResult.errors, ...swResult.errors)
-				result.warnings.push(...libResult.warnings, ...swResult.warnings)
+				result.errors.push(...swResult.errors)
+				result.warnings.push(...swResult.warnings)
 
 				if (watch) {
 					if (result.errors.length)
@@ -269,12 +347,14 @@ function mdToHtmlPl() {
 	const name = "mdToHtml"
 	return {
 		name,
+		/** @param {import("esbuild").PluginBuild} build */
 		setup(build) {
 			const outPaths = []
 			build.onStart(() => { outPaths.length = 0 })
 			build.onLoad({ filter: /\.html\.md$/ }, async ({ path }) => {
-				outPaths.push(path.replace(srcDir.replaceAll("/", pathM.sep).replace(".", ""), outDir.replaceAll("/", pathM.sep).replace(".", "")))
-				const contents = await minifyHtml(DOMPurify.sanitize(await marked(await readFile(path, "utf8"))), htmlOptions)
+				outPaths.push(pathM.join(outDir, pathM.relative(srcDir, path)))
+				const html = DOMPurify.sanitize(await marked(await readFile(path, "utf8")))
+				const contents = watch ? html : await minifyHtml(html, htmlOptions)
 				return { contents, loader: "default" }
 			})
 			build.onEnd(async result => {

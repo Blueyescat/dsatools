@@ -2,7 +2,7 @@ export { }
 declare let self: ServiceWorkerGlobalScope
 
 // changing this file makes the browser update the active SW, and changing cacheName makes it re-cache all files
-const cacheName = "dsatools41."
+const cacheName = "dsatools41,"
 
 const cacheUrls = [
 	/*@build_cacheUrls>*/""/*@build_cacheUrls<*/

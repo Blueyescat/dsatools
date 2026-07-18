@@ -402,7 +402,7 @@ async function generateChangelog() {
 		if (date) firstDate ??= date
 
 		// convert remaining dates
-		section = section.replace(/\d{4}-\d{2}-\d{2}/g, d => `<time datetime="${d}"></time>`)
+		section = section.replace(/ \d{4}-\d{2}-\d{2}/g, d => ` <time datetime="${d}"></time>`)
 
 		// append date into heading or create one
 		const lines = section.split(/\r?\n/)
